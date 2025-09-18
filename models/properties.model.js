@@ -1,4 +1,4 @@
-const propertySchema = new mongoose.Schema({
+const propertiesSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true
@@ -97,6 +97,7 @@ const propertySchema = new mongoose.Schema({
     timestamps: true
 });
 
-const Property = mongoose.model('Property', propertySchema);
+const Property = mongoose.model('Properties', propertiesSchema);
 
 module.exports = Property;
+

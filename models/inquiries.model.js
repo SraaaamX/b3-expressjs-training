@@ -1,4 +1,4 @@
-const inquirySchema = new mongoose.Schema({
+const inquiriesSchema = new mongoose.Schema({
     user_id: {
         type: Number,
         required: true
@@ -38,6 +38,7 @@ const inquirySchema = new mongoose.Schema({
     timestamps: true
 });
 
-const Inquiry = mongoose.model('Inquiry', inquirySchema);
+const Inquiry = mongoose.model('Inquiries', inquiriesSchema);
 
 module.exports = Inquiry;
+

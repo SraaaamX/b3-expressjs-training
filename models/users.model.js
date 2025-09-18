@@ -1,4 +1,4 @@
-const userSchema = new mongoose.Schema({
+const usersSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
@@ -34,6 +34,6 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 });
 
-const User = mongoose.model('User', userSchema);
+const Users = mongoose.model('Users', usersSchema);
 
-module.exports = User;
+module.exports = Users;
