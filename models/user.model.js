@@ -1,0 +1,39 @@
+const userSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    nickname: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    profilepic: {
+        type: String,
+        default: null
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    role: {
+        type: String,
+        enum: ['user', 'agent', 'admin'],
+        default: 'user'
+    },
+    phone: {
+        type: String,
+        default: null
+    }
+}, {
+    timestamps: true
+});
+
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;

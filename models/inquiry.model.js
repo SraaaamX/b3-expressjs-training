@@ -1,0 +1,43 @@
+const inquirySchema = new mongoose.Schema({
+    user_id: {
+        type: Number,
+        required: true
+    },
+    property_id: {
+        type: Number,
+        required: true
+    },
+    inquiry_type: {
+        type: String,
+        required: true,
+        enum: ['visit_request', 'info_request', 'offer']
+    },
+    message: {
+        type: String,
+        required: false
+    },
+    preferred_date: {
+        type: Date,
+        required: false
+    },
+    preferred_time: {
+        type: String,
+        required: false
+    },
+    status: {
+        type: String,
+        required: false,
+        enum: ['pending', 'confirmed', 'completed', 'cancelled'],
+        default: 'pending'
+    },
+    agent_response: {
+        type: String,
+        required: false
+    }
+}, {
+    timestamps: true
+});
+
+const Inquiry = mongoose.model('Inquiry', inquirySchema);
+
+module.exports = Inquiry;
