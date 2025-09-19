@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 const inquiriesSchema = new mongoose.Schema({
     user_id: {
         type: Number,
@@ -38,7 +40,7 @@ const inquiriesSchema = new mongoose.Schema({
     timestamps: true
 });
 
-const Inquiry = mongoose.model('Inquiries', inquiriesSchema);
+const Inquiries = mongoose.model('Inquiries', inquiriesSchema);
 
-module.exports = Inquiry;
+module.exports = Inquiries;
 
