@@ -2,10 +2,10 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const userRoutes = require('./routes/users.route');
+const userRoutes = require('./routes/usersRoutes');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT;
 
 //Middleware
 app.use(cors());
