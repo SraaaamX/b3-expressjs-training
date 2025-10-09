@@ -21,7 +21,12 @@ RESTful API for a real estate application with user management, properties, and 
 1. Clone the repository
 2. Install dependencies: `npm install`
 3. Copy `.env.example` to `.env` and configure environment variables
-4. Start the server: `npm start`
+4. Create the upload directories for images:
+   ```
+   mkdir -p public/uploads/avatars
+   mkdir -p public/uploads/properties
+   ```
+5. Start the server: `npm start`
 
 ## Architecture
 
@@ -38,13 +43,14 @@ The API is structured according to the MVC (Model-View-Controller) pattern:
 - **name**: Full name (required)
 - **nickname**: Unique username (required)
 - **email**: Unique email (required)
-- **profilepic**: Profile picture URL (optional)
+- **profilepic**: Profile picture URL (optional) - Uploaded to `/public/uploads/avatars/`
 - **password**: Hashed password (required)
 - **role**: User role (user, agent, admin)
 - **phone**: Phone number (optional)
 
 ### Property (Properties)
 - **title**: Listing title (required)
+- **image**: Property image URL (optional) - Uploaded to `/public/uploads/properties/`
 - **description**: Detailed description (optional)
 - **price**: Price (required)
 - **property_type**: Property type (house, apartment, villa, studio, office, land)
@@ -75,6 +81,33 @@ The API is structured according to the MVC (Model-View-Controller) pattern:
 - **preferred_time**: Preferred visit time (optional)
 - **status**: Inquiry status (pending, confirmed, completed, cancelled)
 - **agent_response**: Agent response (optional)
+
+## File Upload System
+
+The API supports file uploads for user profile pictures and property images:
+
+1. **User Profile Pictures**: 
+   - Uploaded to `/public/uploads/avatars/`
+   - Maximum file size: 5MB
+   - Supported formats: JPEG, JPG, PNG, GIF
+   - Updated via PATCH request to `/api/users/:id` with form-data
+
+2. **Property Images**:
+   - Uploaded to `/public/uploads/properties/`
+   - Maximum file size: 10MB
+   - Supported formats: JPEG, JPG, PNG, GIF
+   - Added during property creation or update via POST/PUT requests with form-data
+
+3. **Error Handling for Uploads**:
+   - Images are not stored in the backend if there are validation errors in the request
+   - If required fields are missing, the uploaded file is automatically deleted
+   - If database operations fail, the uploaded file is automatically deleted
+   - This prevents orphaned files in the upload directories
+   
+4. **Image Replacement**:
+   - When updating a user's profile picture, the previous image is automatically deleted
+   - When updating a property's image, the previous image is automatically deleted
+   - This ensures efficient storage usage and prevents accumulation of unused files
 
 ## Authentication System
 
@@ -310,6 +343,7 @@ All API responses follow a standardized format:
 - **Request Body**:
   ```json
   {
+    "user_id": "{userId}",
     "property_id": "{propertyId}",
     "inquiry_type": "visit_request",
     "message": "I would like to visit this property as soon as possible",
@@ -388,6 +422,58 @@ All API responses follow a standardized format:
 ## Postman Requests
 
 ### Authentication
+```
+POST /api/auth/register - Register a new user
+  - For profile picture upload: Use form-data with 'profilepic' field for the image file
+  - Other fields (name, nickname, email, password) should be included in the form-data
+  - Supported image formats: JPEG, JPG, PNG, GIF (max 5MB)
+POST /api/auth/login - Login with email and password
+```
+
+### Users
+```
+GET /api/users - Get all users (admin only)
+GET /api/users/:id - Get user by ID (admin or self)
+PATCH /api/users/:id - Update user (admin or self)
+  - For profile picture upload: Use form-data with 'profilepic' field for the image file
+  - Other fields to update should be included in the form-data
+  - Supported image formats: JPEG, JPG, PNG, GIF (max 5MB)
+DELETE /api/users/:id - Delete user (admin or self)
+```
+
+### Properties
+```
+GET /api/properties - Get all properties
+GET /api/properties/search - Search properties with filters
+GET /api/properties/:id - Get property by ID
+POST /api/properties - Create property (agent only)
+  - For image upload: Use form-data with 'image' field for the image file
+  - All other property fields should be included in the form-data
+  - Required fields: title, price, property_type, transaction_type, address, city
+  - Supported image formats: JPEG, JPG, PNG, GIF (max 10MB)
+PUT /api/properties/:id - Update property (agent only)
+  - For image upload: Use form-data with 'image' field for the image file
+  - Fields to update should be included in the form-data
+  - Supported image formats: JPEG, JPG, PNG, GIF (max 10MB)
+DELETE /api/properties/:id - Delete property (agent only)
+PATCH /api/properties/:id/featured - Toggle featured status (agent only)
+PATCH /api/properties/:id/status - Update property status (agent only)
+```
+
+### Inquiries
+```
+GET /api/inquiries - Get all inquiries (admin only)
+GET /api/inquiries/user/:userId - Get inquiries by user ID (admin or self)
+GET /api/inquiries/property/:propertyId - Get inquiries by property ID (admin or agent)
+GET /api/inquiries/:id - Get inquiry by ID (admin, agent, or inquiry owner)
+POST /api/inquiries - Create inquiry (authenticated user)
+PATCH /api/inquiries/:id - Update inquiry (admin, agent, or inquiry owner)
+DELETE /api/inquiries/:id - Delete inquiry (admin, agent, or inquiry owner)
+PATCH /api/inquiries/:id/status - Update inquiry status (admin or agent)
+PATCH /api/inquiries/:id/response - Add agent response (admin or agent)
+```
+
+### Authentication
 
 #### Registration
 ```json
@@ -395,17 +481,53 @@ All API responses follow a standardized format:
   "url": "http://localhost:3000/api/auth/register",
   "method": "POST",
   "header": {
-    "Content-Type": "application/json"
+    "Content-Type": "multipart/form-data"
   },
   "body": {
-    "name": "John Doe",
-    "nickname": "johndoe",
-    "email": "john@example.com",
-    "password": "password123",
-    "role": "user"
+    "mode": "formdata",
+    "formdata": [
+      {
+        "key": "name",
+        "value": "John Doe",
+        "type": "text"
+      },
+      {
+        "key": "nickname",
+        "value": "johndoe",
+        "type": "text"
+      },
+      {
+        "key": "email",
+        "value": "john@example.com",
+        "type": "text"
+      },
+      {
+        "key": "password",
+        "value": "password123",
+        "type": "text"
+      },
+      {
+        "key": "role",
+        "value": "user",
+        "type": "text"
+      },
+      {
+        "key": "profilepic",
+        "type": "file",
+        "src": "/chemin/vers/votre/image.jpg"
+      }
+    ]
   }
 }
 ```
+
+**How to upload a profile picture during registration:**
+1. In Postman, select the POST method for `/api/auth/register`
+2. Instead of "raw" JSON, choose "form-data" in the Body tab
+3. Add all required fields (name, nickname, email, password, role) as text fields
+4. Add a field named "profilepic", select the "File" type and choose your image
+5. Accepted image formats are JPEG, JPG, PNG, and GIF (maximum size: 5MB)
+6. Send the request to create an account with a profile picture
 
 #### Login
 ```json
@@ -452,15 +574,39 @@ All API responses follow a standardized format:
   "url": "http://localhost:3000/api/users/{{userId}}",
   "method": "PATCH",
   "header": {
-    "Content-Type": "application/json",
+    "Content-Type": "multipart/form-data",
     "Authorization": "Bearer {{token}}"
   },
   "body": {
-    "name": "John Updated",
-    "phone": "0123456789"
+    "mode": "formdata",
+    "formdata": [
+      {
+        "key": "name",
+        "value": "John Updated",
+        "type": "text"
+      },
+      {
+        "key": "phone",
+        "value": "0123456789",
+        "type": "text"
+      },
+      {
+        "key": "profilepic",
+        "type": "file",
+        "src": "/chemin/vers/votre/image.jpg"
+      }
+    ]
   }
 }
 ```
+
+**How to update a profile picture:**
+1. In Postman, select the PATCH method for `/api/users/{{userId}}`
+2. Choose "form-data" in the Body tab
+3. Add the fields you want to update as text fields
+4. Add a field named "profilepic", select the "File" type and choose your image
+5. Accepted image formats are JPEG, JPG, PNG, and GIF (maximum size: 5MB)
+6. Don't forget to include the authentication token in the header
 
 #### Delete a user (admin or concerned user)
 ```json
@@ -505,27 +651,99 @@ All API responses follow a standardized format:
   "url": "http://localhost:3000/api/properties",
   "method": "POST",
   "header": {
-    "Content-Type": "application/json",
+    "Content-Type": "multipart/form-data",
     "Authorization": "Bearer {{token}}"
   },
   "body": {
-    "title": "Beautiful apartment in city center",
-    "description": "Bright apartment with city view",
-    "price": 250000,
-    "property_type": "apartment",
-    "transaction_type": "sale",
-    "address": "123 Paris Street",
-    "city": "Paris",
-    "postal_code": "75001",
-    "surface_area": 75,
-    "rooms": 3,
-    "bedrooms": 2,
-    "bathrooms": 1,
-    "parking": true,
-    "balcony": true
+    "mode": "formdata",
+    "formdata": [
+      {
+        "key": "title",
+        "value": "Beautiful apartment in city center",
+        "type": "text"
+      },
+      {
+        "key": "description",
+        "value": "Bright apartment with city view",
+        "type": "text"
+      },
+      {
+        "key": "price",
+        "value": "250000",
+        "type": "text"
+      },
+      {
+        "key": "property_type",
+        "value": "apartment",
+        "type": "text"
+      },
+      {
+        "key": "transaction_type",
+        "value": "sale",
+        "type": "text"
+      },
+      {
+        "key": "address",
+        "value": "123 Paris Street",
+        "type": "text"
+      },
+      {
+        "key": "city",
+        "value": "Paris",
+        "type": "text"
+      },
+      {
+        "key": "postal_code",
+        "value": "75001",
+        "type": "text"
+      },
+      {
+        "key": "surface_area",
+        "value": "75",
+        "type": "text"
+      },
+      {
+        "key": "rooms",
+        "value": "3",
+        "type": "text"
+      },
+      {
+        "key": "bedrooms",
+        "value": "2",
+        "type": "text"
+      },
+      {
+        "key": "bathrooms",
+        "value": "1",
+        "type": "text"
+      },
+      {
+        "key": "parking",
+        "value": "true",
+        "type": "text"
+      },
+      {
+        "key": "balcony",
+        "value": "true",
+        "type": "text"
+      },
+      {
+        "key": "image",
+        "type": "file",
+        "src": "/chemin/vers/votre/image.jpg"
+      }
+    ]
   }
 }
 ```
+
+**How to add an image when creating a property:**
+1. In Postman, select the POST method for `/api/properties`
+2. Choose "form-data" in the Body tab
+3. Add all required fields as text fields
+4. Add a field named "image", select the "File" type and choose your image
+5. Accepted image formats are JPEG, JPG, PNG, and GIF (maximum size: 10MB)
+6. Don't forget to include the authentication token in the header
 
 #### Update a property (agent/admin)
 ```json
@@ -533,15 +751,39 @@ All API responses follow a standardized format:
   "url": "http://localhost:3000/api/properties/{{propertyId}}",
   "method": "PUT",
   "header": {
-    "Content-Type": "application/json",
+    "Content-Type": "multipart/form-data",
     "Authorization": "Bearer {{token}}"
   },
   "body": {
-    "price": 260000,
-    "description": "Bright apartment with city view and close to shops"
+    "mode": "formdata",
+    "formdata": [
+      {
+        "key": "price",
+        "value": "260000",
+        "type": "text"
+      },
+      {
+        "key": "description",
+        "value": "Bright apartment with city view and close to shops",
+        "type": "text"
+      },
+      {
+        "key": "image",
+        "type": "file",
+        "src": "/chemin/vers/votre/image.jpg"
+      }
+    ]
   }
 }
 ```
+
+**How to update a property image:**
+1. In Postman, select the PUT method for `/api/properties/{{propertyId}}`
+2. Choose "form-data" in the Body tab
+3. Add the fields you want to update as text fields
+4. Add a field named "image", select the "File" type and choose your image
+5. Accepted image formats are JPEG, JPG, PNG, and GIF (maximum size: 10MB)
+6. Don't forget to include the authentication token in the header
 
 #### Delete a property (agent/admin)
 ```json

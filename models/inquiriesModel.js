@@ -2,11 +2,13 @@ const mongoose = require('mongoose');
 
 const inquiriesSchema = new mongoose.Schema({
     user_id: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Users',
         required: true
     },
     property_id: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Properties',
         required: true
     },
     inquiry_type: {

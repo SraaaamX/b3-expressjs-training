@@ -5,6 +5,10 @@ const propertiesSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    image: {
+        type: String,
+        default: null
+    },
     description: {
         type: String,
         required: false

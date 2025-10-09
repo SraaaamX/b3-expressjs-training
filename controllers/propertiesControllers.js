@@ -1,4 +1,5 @@
 const Properties = require('../models/propertiesModel');
+const path = require('path');
 
 // Get all properties
 exports.getAllProperties = async (req, res) => {
@@ -36,26 +37,65 @@ exports.createProperty = async (req, res) => {
         
         // Vérification des champs obligatoires
         if (!title || !price || !property_type || !transaction_type || !address || !city) {
+            // Delete uploaded file if validation fails
+            if (req.uploadedFile) {
+                const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
+                deleteUploadedFile(req.uploadedFile.path);
+            }
             return res.status(400).json({ error: 'Required fields are missing' });
         }
         
-        const newProperty = await Properties.create(req.body);
+        const propertyData = { ...req.body };
+        
+        // If file was uploaded, add the image path
+        if (req.file) {
+            propertyData.image = req.uploadedFile ? req.uploadedFile.url : `/uploads/properties/${req.file.filename}`;
+        }
+        
+        const newProperty = await Properties.create(propertyData);
         res.status(201).json(newProperty);
     } catch (error) {
+        // Delete uploaded file if an error occurred
+        if (req.uploadedFile) {
+            const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
+            deleteUploadedFile(req.uploadedFile.path);
+        }
         res.status(500).json({ error: error.message });
     }
 };
 
 // Update a property
 exports.updateProperty = async (req, res) => {
+    const updates = { ...req.body };
+    
     try {
+        // Get the current property to check if it has an image
+        const currentProperty = await Properties.findById(req.params.id);
+        
+        // If file was uploaded, add the image path and delete old image
+        if (req.file) {
+            // Delete previous property image if it exists
+            if (currentProperty && currentProperty.image) {
+                const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
+                const oldImagePath = path.join(__dirname, '../public', currentProperty.image);
+                deleteUploadedFile(oldImagePath);
+            }
+            
+            updates.image = req.uploadedFile ? req.uploadedFile.url : `/uploads/properties/${req.file.filename}`;
+        }
+        
         const updatedProperty = await Properties.findByIdAndUpdate(
             req.params.id,
-            req.body,
+            updates,
             { new: true, runValidators: true }
         );
         
         if (!updatedProperty) {
+            // Delete uploaded file if property not found
+            if (req.uploadedFile) {
+                const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
+                deleteUploadedFile(req.uploadedFile.path);
+            }
             return res.status(404).json({ error: 'Property not found' });
         }
         
@@ -64,6 +104,11 @@ exports.updateProperty = async (req, res) => {
             data: updatedProperty
         });
     } catch (error) {
+        // Delete uploaded file if an error occurred
+        if (req.uploadedFile) {
+            const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
+            deleteUploadedFile(req.uploadedFile.path);
+        }
         res.status(500).json({ error: error.message });
     }
 };

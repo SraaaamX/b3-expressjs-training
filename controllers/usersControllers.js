@@ -1,6 +1,7 @@
 const Users = require('../models/usersModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 
 exports.getAllUsers = async (req, res) => {
     try {
@@ -41,17 +42,45 @@ exports.createUser = async (req, res) => {
     try {
         const { name, nickname, email, password, role } = req.body;
         if (!name || !nickname || !email || !password) {
+            // If there was an uploaded file, delete it since validation failed
+            if (req.uploadedFile) {
+                const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
+                deleteUploadedFile(req.uploadedFile.path);
+            }
             return res.status(400).json({ error: 'All fields are required' });
         }
         const existingUser = await Users.findOne({ email });
         if (existingUser) {
+            // If there was an uploaded file, delete it since validation failed
+            if (req.uploadedFile) {
+                const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
+                deleteUploadedFile(req.uploadedFile.path);
+            }
             return res.status(409).json({ error: 'User with this email already exists' });
         }
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await Users.create({ name, nickname, email, password: hashedPassword, role });
+        
+        const userData = {
+            name,
+            nickname,
+            email,
+            password: await bcrypt.hash(password, 10),
+            role
+        };
+        
+        // If profile picture was uploaded, add it to userData
+        if (req.file) {
+            userData.profilepic = req.uploadedFile ? req.uploadedFile.url : `/uploads/avatars/${req.file.filename}`;
+        }
+        
+        const user = await Users.create(userData);
         const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET_KEY, { expiresIn: process.env.JWT_EXPIRES_IN });
         res.status(201).json({ ...user.toObject(), token });
     } catch (error) {
+        // If there was an uploaded file, delete it since an error occurred
+        if (req.uploadedFile) {
+            const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
+            deleteUploadedFile(req.uploadedFile.path);
+        }
         res.status(500).json({ error: error.message });
     }
 };
@@ -84,6 +113,11 @@ exports.updateUser = async (req, res) => {
         const isSelfUpdate = req.user.userId === req.params.id;
         
         if (!isAdmin && !isSelfUpdate) {
+            // Delete uploaded file if permission check fails
+            if (req.uploadedFile) {
+                const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
+                deleteUploadedFile(req.uploadedFile.path);
+            }
             return res.status(403).json({ error: 'Access denied: You can only update your own account' });
         }
         
@@ -97,8 +131,28 @@ exports.updateUser = async (req, res) => {
             delete updates.role;
         }
         
+        // Get the current user to check if they have a profile picture
+        const currentUser = await Users.findById(req.params.id);
+        
+        // If file was uploaded, add the profilepic path to updates and delete old image
+        if (req.file) {
+            // Delete previous profile picture if it exists
+            if (currentUser && currentUser.profilepic) {
+                const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
+                const oldImagePath = path.join(__dirname, '../public', currentUser.profilepic);
+                deleteUploadedFile(oldImagePath);
+            }
+            
+            updates.profilepic = req.uploadedFile ? req.uploadedFile.url : `/uploads/avatars/${req.file.filename}`;
+        }
+        
         const updatedUser = await Users.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true }).select('-password');
         if (!updatedUser) {
+            // Delete uploaded file if user not found
+            if (req.uploadedFile) {
+                const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
+                deleteUploadedFile(req.uploadedFile.path);
+            }
             return res.status(404).json({ error: 'User not found' });
         }
         res.status(200).json({
@@ -106,6 +160,11 @@ exports.updateUser = async (req, res) => {
             data: updatedUser
         });
     } catch (error) {
+        // Delete uploaded file if an error occurred
+        if (req.uploadedFile) {
+            const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
+            deleteUploadedFile(req.uploadedFile.path);
+        }
         res.status(500).json({ error: error.message });
     }
 };

@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/usersControllers');
+const { uploadProfilePic } = require('../middlewares/uploadMiddleware');
 
-// Routes d'authentification
-router.post('/register', userController.createUser);
+// Authentication routes
+router.post('/register', uploadProfilePic, userController.createUser);
 router.post('/login', userController.loginUser);
 
 module.exports = router;
