@@ -12,6 +12,9 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/users', userRoutes);
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/properties', require('./routes/propertiesRoutes'));
+app.use('/api/inquiries', require('./routes/inquiriesRoutes'));
 
 //Connect to DB
 mongoose.connect(process.env.MONGO_URI)

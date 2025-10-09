@@ -1,15 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const verifyToken = require('../middlewares/verifyToken');
+const verifyAdmin = require('../middlewares/verifyAdmin');
 const userController = require('../controllers/usersControllers');
 
-// Routes publiques
-router.post('/', userController.createUser);
-router.post('/login', userController.loginUser);
+// Routes with authentication
 
-// Routes avec authentification
+// Routes accessible only to administrators
+router.get('/', verifyToken, verifyAdmin, userController.getAllUsers);
 
-router.get('/', verifyToken, userController.getAllUsers);
+// Routes accessible to the concerned user or an administrator
+// Authorization logic is handled in the controllers
 router.get('/:id', verifyToken, userController.getUserById);
 router.patch('/:id', verifyToken, userController.updateUser);
 router.delete('/:id', verifyToken, userController.deleteUser);

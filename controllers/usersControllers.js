@@ -16,11 +16,22 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getUserById = async (req, res) => {
     try {
-        const userById = await Users.findById(req.params.id).select('-password');
-        if (!userById) {
+        // Check if user is admin or viewing their own account
+        const isAdmin = req.user.role === 'admin';
+        const isSelfQuery = req.user.userId === req.params.id;
+        
+        if (!isAdmin && !isSelfQuery) {
+            return res.status(403).json({ error: 'Access denied: You can only view your own account' });
+        }
+        
+        const user = await Users.findById(req.params.id).select('-password');
+        if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
-        res.status(200).json(userById);
+        res.status(200).json({ 
+            message: 'User retrieved successfully',
+            data: user
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -68,15 +79,32 @@ exports.loginUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
     try {
+        // Check if user is admin or updating their own account
+        const isAdmin = req.user.role === 'admin';
+        const isSelfUpdate = req.user.userId === req.params.id;
+        
+        if (!isAdmin && !isSelfUpdate) {
+            return res.status(403).json({ error: 'Access denied: You can only update your own account' });
+        }
+        
         const updates = { ...req.body };
         if (updates.password) {
             updates.password = await bcrypt.hash(updates.password, 10);
         }
+        
+        // If user is not admin, prevent role modification
+        if (!isAdmin && updates.role) {
+            delete updates.role;
+        }
+        
         const updatedUser = await Users.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true }).select('-password');
         if (!updatedUser) {
             return res.status(404).json({ error: 'User not found' });
         }
-        res.status(200).json(updatedUser);
+        res.status(200).json({
+            message: 'User updated successfully',
+            data: updatedUser
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -84,6 +112,14 @@ exports.updateUser = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
     try {
+        // Check if user is admin or deleting their own account
+        const isAdmin = req.user.role === 'admin';
+        const isSelfDelete = req.user.userId === req.params.id;
+        
+        if (!isAdmin && !isSelfDelete) {
+            return res.status(403).json({ error: 'Access denied: You can only delete your own account' });
+        }
+        
         const userToDelete = await Users.findByIdAndDelete(req.params.id);
         if (!userToDelete) {
             return res.status(404).json({ error: 'User not found' });
@@ -93,27 +129,3 @@ exports.deleteUser = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
-// POSTMAN requests with content-type application/json raw json
-
-// GET http://localhost:3000/api/users
-
-// GET http://localhost:3000/api/users/1
-
-// POST http://localhost:3000/api/users
-// {
-//     "name": "John Doe",
-//     "nickname": "johndoe",
-//     "email": "L1NtM@example.com",
-//     "password": "password123"
-// }
-
-// PUT http://localhost:3000/api/users/1
-// {
-//     "name": "John Doe",
-//     "nickname": "johndoe",
-//     "email": "L1NtM@example.com",
-//     "password": "password1234"
-// }
-
-// DELETE http://localhost:3000/api/users/1
