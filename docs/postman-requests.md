@@ -369,6 +369,7 @@ POST /api/auth/login - Login with email and password
     "Authorization": "Bearer {{token}}"
   },
   "body": {
+    "user_id": "{{userId}}",
     "property_id": "{{propertyId}}",
     "inquiry_type": "visit_request",
     "message": "I would like to visit this property as soon as possible",
