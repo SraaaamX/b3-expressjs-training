@@ -19,6 +19,7 @@ log
 # Ignore bundled artifacts
 /dist
 build
+public
 
 # Ignore OS files
 .DS_Store
