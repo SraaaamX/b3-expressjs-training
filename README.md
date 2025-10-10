@@ -56,11 +56,11 @@ b3-expressjs-training/
 
 ## Table of Contents
 
-- [Installation](installation.md)
-- [Architecture](architecture.md)
-- [Data Models](data-models.md)
-- [File Upload System](file-upload.md)
-- [Authentication System](authentication.md)
-- [Access Management](access-management.md)
-- [API Documentation](api-documentation.md)
-- [Postman Requests](postman-requests.md)
+- [Installation](docs/installation.md)
+- [Architecture](docs/architecture.md)
+- [Data Models](docs/data-models.md)
+- [File Upload System](docs/file-upload.md)
+- [Authentication System](docs/authentication.md)
+- [Access Management](docs/access-management.md)
+- [API Documentation](docs/api-documentation.md)
+- [Postman Requests](docs/postman-requests.md)
