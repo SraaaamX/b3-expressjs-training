@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
+const { toUserDto, toUserDtoList, fromCreateUserDto, fromUpdateUserDto } = require('../mappers/usersMappers');
 
 class UsersService {
     /**
@@ -13,7 +14,7 @@ class UsersService {
         if (!users.length) {
             throw { status: 404, message: 'No users found' };
         }
-        return users;
+        return toUserDtoList(users);
     }
 
     async getUserById(userId, requestingUser) {
@@ -30,7 +31,7 @@ class UsersService {
             throw { status: 404, message: 'User not found' };
         }
         
-        return user;
+        return toUserDto(user);
     }
 
     async createUser(userData, uploadedFile = null) {
@@ -53,22 +54,17 @@ class UsersService {
             throw { status: 409, message: 'User with this email already exists' };
         }
         
-        // Préparation des données utilisateur
-        const newUserData = {
-            name,
-            nickname,
-            email,
-            password: await bcrypt.hash(password, 10),
-            role
-        };
+        // Préparation des données utilisateur avec le DTO
+        const userDataDto = fromCreateUserDto(userData);
+        userDataDto.password = await bcrypt.hash(password, 10);
         
         // Ajout de la photo de profil si elle existe
         if (uploadedFile) {
-            newUserData.profilepic = uploadedFile.url || `/uploads/avatars/${uploadedFile.filename}`;
+            userDataDto.profilepic = uploadedFile.url || `/uploads/avatars/${uploadedFile.filename}`;
         }
         
         // Création de l'utilisateur
-        const user = await Users.create(newUserData);
+        const user = await Users.create(userDataDto);
         
         // Génération du token
         const token = jwt.sign(
@@ -77,7 +73,7 @@ class UsersService {
             { expiresIn: process.env.JWT_EXPIRES_IN }
         );
         
-        return { user: user.toObject(), token };
+        return { user: toUserDto(user), token };
     }
 
     async loginUser(email, password) {

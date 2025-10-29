@@ -1,6 +1,7 @@
 const Properties = require('../models/propertiesModel');
 const path = require('path');
 const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
+const { toPropertyDto, toPropertyDtoList, fromCreatePropertyDto, fromUpdatePropertyDto } = require('../mappers/propertiesMappers');
 
 class PropertiesService {
     /**
@@ -11,7 +12,7 @@ class PropertiesService {
         if (!properties.length) {
             throw { status: 404, message: 'No properties found' };
         }
-        return properties;
+        return toPropertyDtoList(properties);
     }
 
     async getPropertyById(propertyId) {
@@ -19,7 +20,7 @@ class PropertiesService {
         if (!property) {
             throw { status: 404, message: 'Property not found' };
         }
-        return property;
+        return toPropertyDto(property);
     }
 
     async createProperty(propertyData, uploadedFile = null) {
@@ -33,7 +34,7 @@ class PropertiesService {
             throw { status: 400, message: 'Required fields are missing' };
         }
         
-        const newPropertyData = { ...propertyData };
+        const newPropertyData = fromCreatePropertyDto(propertyData);
         
         // Ajout de l'image si elle existe
         if (uploadedFile) {
@@ -41,11 +42,11 @@ class PropertiesService {
         }
         
         const newProperty = await Properties.create(newPropertyData);
-        return newProperty;
+        return toPropertyDto(newProperty);
     }
 
     async updateProperty(propertyId, updates, uploadedFile = null) {
-        const updateData = { ...updates };
+        const updateData = fromUpdatePropertyDto(updates);
         
         // Récupération de la propriété actuelle pour gérer l'ancienne image
         const currentProperty = await Properties.findById(propertyId);
@@ -75,7 +76,7 @@ class PropertiesService {
             throw { status: 404, message: 'Property not found' };
         }
         
-        return updatedProperty;
+        return toPropertyDto(updatedProperty);
     }
 
     /**

@@ -1,5 +1,14 @@
 # API Documentation
 
+## Data Architecture
+
+The API uses a layered architecture with:
+- **Data Models**: Define the database data structure
+- **DTOs (Data Transfer Objects)**: Classes that define the structure of exchanged data
+- **Mappers**: Components responsible for transformation between models and DTOs
+
+All endpoints return structured DTO objects rather than raw database models.
+
 ## Response Format
 
 All API responses follow a standardized format:

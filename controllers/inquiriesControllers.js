@@ -1,4 +1,5 @@
 const inquiriesService = require('../services/inquiriesServices');
+const { toInquiryDto, toInquiryDtoList, fromCreateInquiryDto, fromUpdateInquiryDto } = require('../mappers/inquiriesMappers');
 
 // Get all inquiries
 exports.getAllInquiries = async (req, res) => {

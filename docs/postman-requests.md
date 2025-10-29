@@ -49,7 +49,7 @@ POST /api/auth/login - Login with email and password
       {
         "key": "profilepic",
         "type": "file",
-        "src": "/chemin/vers/votre/image.jpg"
+        "src": "/path/to/your/image.jpg"
       }
     ]
   }

@@ -1,4 +1,5 @@
 const Inquiries = require('../models/inquiriesModel');
+const { toInquiryDto, toInquiryDtoList, fromCreateInquiryDto, fromUpdateInquiryDto } = require('../mappers/inquiriesMappers');
 
 class InquiriesService {
     /**
@@ -9,7 +10,7 @@ class InquiriesService {
         if (!inquiries.length) {
             throw { status: 404, message: 'No inquiries found' };
         }
-        return inquiries;
+        return toInquiryDtoList(inquiries);
     }
 
     async getInquiryById(inquiryId) {
@@ -17,7 +18,7 @@ class InquiriesService {
         if (!inquiry) {
             throw { status: 404, message: 'Inquiry not found' };
         }
-        return inquiry;
+        return toInquiryDto(inquiry);
     }
 
     async createInquiry(inquiryData) {
@@ -28,14 +29,17 @@ class InquiriesService {
             throw { status: 400, message: 'Required fields are missing' };
         }
 
-        const newInquiry = await Inquiries.create(inquiryData);
-        return newInquiry;
+        const newInquiryData = fromCreateInquiryDto(inquiryData);
+        const newInquiry = await Inquiries.create(newInquiryData);
+        return toInquiryDto(newInquiry);
     }
 
     async updateInquiry(inquiryId, updates) {
+        const updateData = fromUpdateInquiryDto(updates);
+        
         const updatedInquiry = await Inquiries.findByIdAndUpdate(
             inquiryId,
-            updates,
+            updateData,
             { new: true, runValidators: true }
         );
 
@@ -43,7 +47,7 @@ class InquiriesService {
             throw { status: 404, message: 'Inquiry not found' };
         }
 
-        return updatedInquiry;
+        return toInquiryDto(updatedInquiry);
     }
 
     async deleteInquiry(inquiryId) {
@@ -63,7 +67,7 @@ class InquiriesService {
             throw { status: 404, message: 'No inquiries found for this user' };
         }
 
-        return inquiries;
+        return toInquiryDtoList(inquiries);
     }
 
     async getInquiriesByProperty(propertyId) {
@@ -73,7 +77,7 @@ class InquiriesService {
             throw { status: 404, message: 'No inquiries found for this property' };
         }
 
-        return inquiries;
+        return toInquiryDtoList(inquiries);
     }
 
     async updateInquiryStatus(inquiryId, status) {
@@ -93,7 +97,7 @@ class InquiriesService {
             throw { status: 404, message: 'Inquiry not found' };
         }
 
-        return inquiry;
+        return toInquiryDto(inquiry);
     }
 
     async addAgentResponse(inquiryId, agentResponse) {
@@ -111,7 +115,7 @@ class InquiriesService {
             throw { status: 404, message: 'Inquiry not found' };
         }
 
-        return inquiry;
+        return toInquiryDto(inquiry);
     }
 }
 
