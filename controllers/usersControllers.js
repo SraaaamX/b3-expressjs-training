@@ -1,190 +1,86 @@
-const Users = require('../models/usersModel');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const path = require('path');
+const usersService = require('../services/usersServices');
 
 exports.getAllUsers = async (req, res) => {
     try {
-        const allUsers = await Users.find().select('-password');
-        if (!allUsers.length) {
-            return res.status(404).json({ error: 'No users found' });
-        }
-        res.status(200).json(allUsers);
+        const users = await usersService.getAllUsers();
+        res.status(200).json(users);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        const status = error.status || 500;
+        res.status(status).json({ error: error.message });
     }
 };
 
 exports.getUserById = async (req, res) => {
     try {
-        // Check if user is admin or viewing their own account
-        const isAdmin = req.user.role === 'admin';
-        const isSelfQuery = req.user.userId === req.params.id;
-        
-        if (!isAdmin && !isSelfQuery) {
-            return res.status(403).json({ error: 'Access denied: You can only view your own account' });
-        }
-        
-        const user = await Users.findById(req.params.id).select('-password');
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
+        const user = await usersService.getUserById(req.params.id, req.user);
         res.status(200).json({ 
             message: 'User retrieved successfully',
             data: user
         });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        const status = error.status || 500;
+        res.status(status).json({ error: error.message });
     }
 };
 
 exports.createUser = async (req, res) => {
     try {
-        const { name, nickname, email, password, role } = req.body;
-        if (!name || !nickname || !email || !password) {
-            // If there was an uploaded file, delete it since validation failed
-            if (req.uploadedFile) {
-                const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
-                deleteUploadedFile(req.uploadedFile.path);
-            }
-            return res.status(400).json({ error: 'All fields are required' });
-        }
-        const existingUser = await Users.findOne({ email });
-        if (existingUser) {
-            // If there was an uploaded file, delete it since validation failed
-            if (req.uploadedFile) {
-                const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
-                deleteUploadedFile(req.uploadedFile.path);
-            }
-            return res.status(409).json({ error: 'User with this email already exists' });
-        }
+        const uploadedFile = req.file ? {
+            path: req.uploadedFile?.path,
+            url: req.uploadedFile?.url,
+            filename: req.file.filename
+        } : null;
         
-        const userData = {
-            name,
-            nickname,
-            email,
-            password: await bcrypt.hash(password, 10),
-            role
-        };
-        
-        // If profile picture was uploaded, add it to userData
-        if (req.file) {
-            userData.profilepic = req.uploadedFile ? req.uploadedFile.url : `/uploads/avatars/${req.file.filename}`;
-        }
-        
-        const user = await Users.create(userData);
-        const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET_KEY, { expiresIn: process.env.JWT_EXPIRES_IN });
-        res.status(201).json({ ...user.toObject(), token });
+        const result = await usersService.createUser(req.body, uploadedFile);
+        res.status(201).json(result);
     } catch (error) {
-        // If there was an uploaded file, delete it since an error occurred
-        if (req.uploadedFile) {
-            const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
-            deleteUploadedFile(req.uploadedFile.path);
-        }
-        res.status(500).json({ error: error.message });
+        const status = error.status || 500;
+        res.status(status).json({ error: error.message });
     }
 };
 
 exports.loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
-        if (!email || !password) {
-            return res.status(400).json({ error: 'All fields are required' });
-        }
-        const user = await Users.findOne({ email });
-        if (!user) {
-            return res.status(401).json({ error: 'Invalid credentials' });
-        }
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(401).json({ error: 'Invalid credentials' });
-        }
-        const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET_KEY, { expiresIn: process.env.JWT_EXPIRES_IN });
-        res.status(200).json({ token });
+        const result = await usersService.loginUser(email, password);
+        res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        const status = error.status || 500;
+        res.status(status).json({ error: error.message });
     }
 };
 
 exports.updateUser = async (req, res) => {
     try {
-        // Check if user is admin or updating their own account
-        const isAdmin = req.user.role === 'admin';
-        const isSelfUpdate = req.user.userId === req.params.id;
+        const uploadedFile = req.file ? {
+            path: req.uploadedFile?.path,
+            url: req.uploadedFile?.url,
+            filename: req.file.filename
+        } : null;
         
-        if (!isAdmin && !isSelfUpdate) {
-            // Delete uploaded file if permission check fails
-            if (req.uploadedFile) {
-                const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
-                deleteUploadedFile(req.uploadedFile.path);
-            }
-            return res.status(403).json({ error: 'Access denied: You can only update your own account' });
-        }
+        const updatedUser = await usersService.updateUser(
+            req.params.id,
+            req.body,
+            req.user,
+            uploadedFile
+        );
         
-        const updates = { ...req.body };
-        if (updates.password) {
-            updates.password = await bcrypt.hash(updates.password, 10);
-        }
-        
-        // If user is not admin, prevent role modification
-        if (!isAdmin && updates.role) {
-            delete updates.role;
-        }
-        
-        // Get the current user to check if they have a profile picture
-        const currentUser = await Users.findById(req.params.id);
-        
-        // If file was uploaded, add the profilepic path to updates and delete old image
-        if (req.file) {
-            // Delete previous profile picture if it exists
-            if (currentUser && currentUser.profilepic) {
-                const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
-                const oldImagePath = path.join(__dirname, '../public', currentUser.profilepic);
-                deleteUploadedFile(oldImagePath);
-            }
-            
-            updates.profilepic = req.uploadedFile ? req.uploadedFile.url : `/uploads/avatars/${req.file.filename}`;
-        }
-        
-        const updatedUser = await Users.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true }).select('-password');
-        if (!updatedUser) {
-            // Delete uploaded file if user not found
-            if (req.uploadedFile) {
-                const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
-                deleteUploadedFile(req.uploadedFile.path);
-            }
-            return res.status(404).json({ error: 'User not found' });
-        }
         res.status(200).json({
             message: 'User updated successfully',
             data: updatedUser
         });
     } catch (error) {
-        // Delete uploaded file if an error occurred
-        if (req.uploadedFile) {
-            const { deleteUploadedFile } = require('../middlewares/uploadMiddleware');
-            deleteUploadedFile(req.uploadedFile.path);
-        }
-        res.status(500).json({ error: error.message });
+        const status = error.status || 500;
+        res.status(status).json({ error: error.message });
     }
 };
 
 exports.deleteUser = async (req, res) => {
     try {
-        // Check if user is admin or deleting their own account
-        const isAdmin = req.user.role === 'admin';
-        const isSelfDelete = req.user.userId === req.params.id;
-        
-        if (!isAdmin && !isSelfDelete) {
-            return res.status(403).json({ error: 'Access denied: You can only delete your own account' });
-        }
-        
-        const userToDelete = await Users.findByIdAndDelete(req.params.id);
-        if (!userToDelete) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        res.status(200).json({ message: 'User deleted successfully' });
+        const result = await usersService.deleteUser(req.params.id, req.user);
+        res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        const status = error.status || 500;
+        res.status(status).json({ error: error.message });
     }
 };
