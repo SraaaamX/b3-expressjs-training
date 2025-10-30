@@ -2,10 +2,10 @@
 
 ## About
 
-The Real Estate API is a comprehensive backend solution built with Express.js for managing real estate properties, user accounts, and property inquiries. This API provides a robust foundation for developing real estate applications with features including:
+The Real Estate API is a comprehensive backend solution built with Express.js for managing real estate properties, user accounts, and property inquiries. This API provides a robust foundation for developing real estate applications with the following features:
 
-- User authentication and role-based access control
-- Property listing management with detailed property information
+- User authentication with JWT and role-based access control
+- Complete property listing management with detailed property information
 - Inquiry system for property visits and information requests
 - File upload system for user avatars and property images
 - Standardized API responses for consistent client integration
@@ -16,12 +16,15 @@ This project follows the MVC (Model-View-Controller) architecture pattern and im
 
 ```
 b3-expressjs-training/
+├── config/                # Configuration files
+│   ├── database/          # Database configuration
+│   ├── routes/            # Routes configuration
+│   └── server/            # Server configuration
 ├── controllers/           # Business logic for handling requests
 │   ├── inquiriesControllers.js
 │   ├── propertiesControllers.js
 │   └── usersControllers.js
 ├── docs/                  # Documentation files
-│   ├── README.md
 │   ├── access-management.md
 │   ├── api-documentation.md
 │   ├── architecture.md
@@ -29,7 +32,15 @@ b3-expressjs-training/
 │   ├── data-models.md
 │   ├── file-upload.md
 │   ├── installation.md
-│   └── postman-requests.md
+│   └── postman-json/      # Postman collection files
+├── dtos/                  # Data Transfer Objects
+│   ├── inquiriesDtos.js
+│   ├── propertiesDtos.js
+│   └── usersDtos.js
+├── mappers/               # Object mappers
+│   ├── inquiriesMappers.js
+│   ├── propertiesMappers.js
+│   └── usersMappers.js
 ├── middlewares/           # Request processing middleware
 │   ├── uploadMiddleware.js
 │   ├── verifyAdmin.js
@@ -39,15 +50,15 @@ b3-expressjs-training/
 │   ├── inquiriesModel.js
 │   ├── propertiesModel.js
 │   └── usersModel.js
-├── public/                # Public assets
-│   └── uploads/           # Uploaded files storage
-│       ├── avatars/       # User profile pictures
-│       └── properties/    # Property images
 ├── routes/                # API route definitions
 │   ├── authRoutes.js
 │   ├── inquiriesRoutes.js
 │   ├── propertiesRoutes.js
 │   └── usersRoutes.js
+├── services/              # Business logic services
+│   ├── inquiriesServices.js
+│   ├── propertiesServices.js
+│   └── usersServices.js
 ├── .env.example           # Environment variables template
 ├── index.js               # Application entry point
 ├── package.json           # Project dependencies and scripts
@@ -63,4 +74,4 @@ b3-expressjs-training/
 - [Authentication System](docs/authentication.md)
 - [Access Management](docs/access-management.md)
 - [API Documentation](docs/api-documentation.md)
-- [Postman Requests](docs/postman-requests.md)
+- [Postman Collection](docs/postman-json/)
