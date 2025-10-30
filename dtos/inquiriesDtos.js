@@ -1,72 +1,61 @@
 /**
  * DTOs for inquiries
+ * These DTOs are designed to match the inquiry model structure
  */
 
 /**
- * Transforms an inquiry object into a response DTO
+ * DTO representing an inquiry in API responses
  */
-const toInquiryDto = (inquiry) => {
-    if (!inquiry) return null;
-    
-    return {
-        id: inquiry._id,
-        user_id: inquiry.user_id,
-        property_id: inquiry.property_id,
-        inquiry_type: inquiry.inquiry_type,
-        message: inquiry.message,
-        preferred_date: inquiry.preferred_date,
-        preferred_time: inquiry.preferred_time,
-        status: inquiry.status,
-        agent_response: inquiry.agent_response,
-        createdAt: inquiry.createdAt,
-        updatedAt: inquiry.updatedAt
-    };
-};
+class InquiryDto {
+    constructor(id, user_id, property_id, inquiry_type, message, preferred_date, 
+                preferred_time, status, agent_response, createdAt, updatedAt) {
+        this.id = id;
+        this.user_id = user_id;
+        this.property_id = property_id;
+        this.inquiry_type = inquiry_type;
+        this.message = message;
+        this.preferred_date = preferred_date;
+        this.preferred_time = preferred_time;
+        this.status = status;
+        this.agent_response = agent_response;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+}
 
 /**
- * Transforms an array of inquiries into an array of DTOs
+ * DTO for creating an inquiry
  */
-const toInquiryDtoList = (inquiries) => {
-    if (!inquiries || !Array.isArray(inquiries)) return [];
-    
-    return inquiries.map(inquiry => toInquiryDto(inquiry));
-};
+class CreateInquiryDto {
+    constructor(user_id, property_id, inquiry_type, message, preferred_date, 
+                preferred_time, status = 'pending', agent_response = null) {
+        this.user_id = user_id;
+        this.property_id = property_id;
+        this.inquiry_type = inquiry_type;
+        this.message = message;
+        this.preferred_date = preferred_date;
+        this.preferred_time = preferred_time;
+        this.status = status;
+        this.agent_response = agent_response;
+    }
+}
 
 /**
- * Prepares an object for inquiry creation
+ * DTO for updating an inquiry
  */
-const fromCreateInquiryDto = (inquiryData) => {
-    return {
-        user_id: inquiryData.user_id,
-        property_id: inquiryData.property_id,
-        inquiry_type: inquiryData.inquiry_type,
-        message: inquiryData.message,
-        preferred_date: inquiryData.preferred_date,
-        preferred_time: inquiryData.preferred_time,
-        status: inquiryData.status || 'pending',
-        agent_response: inquiryData.agent_response
-    };
-};
-
-/**
- * Prepares an object for inquiry update
- */
-const fromUpdateInquiryDto = (inquiryData) => {
-    const updateData = {};
-    
-    if (inquiryData.inquiry_type !== undefined) updateData.inquiry_type = inquiryData.inquiry_type;
-    if (inquiryData.message !== undefined) updateData.message = inquiryData.message;
-    if (inquiryData.preferred_date !== undefined) updateData.preferred_date = inquiryData.preferred_date;
-    if (inquiryData.preferred_time !== undefined) updateData.preferred_time = inquiryData.preferred_time;
-    if (inquiryData.status !== undefined) updateData.status = inquiryData.status;
-    if (inquiryData.agent_response !== undefined) updateData.agent_response = inquiryData.agent_response;
-    
-    return updateData;
-};
+class UpdateInquiryDto {
+    constructor(data = {}) {
+        if (data.inquiry_type !== undefined) this.inquiry_type = data.inquiry_type;
+        if (data.message !== undefined) this.message = data.message;
+        if (data.preferred_date !== undefined) this.preferred_date = data.preferred_date;
+        if (data.preferred_time !== undefined) this.preferred_time = data.preferred_time;
+        if (data.status !== undefined) this.status = data.status;
+        if (data.agent_response !== undefined) this.agent_response = data.agent_response;
+    }
+}
 
 module.exports = {
-    toInquiryDto,
-    toInquiryDtoList,
-    fromCreateInquiryDto,
-    fromUpdateInquiryDto
+    InquiryDto,
+    CreateInquiryDto,
+    UpdateInquiryDto
 };

@@ -1,17 +1,20 @@
 /**
  * User DTOs
+ * These DTOs are designed to match the user model structure and provide consistent data transfer objects
  */
 
 /**
  * DTO representing a user in API responses
  */
 class UserDto {
-    constructor(id, username, email, role, profile_image, createdAt, updatedAt) {
+    constructor(id, name, nickname, email, role, profilepic, phone, createdAt, updatedAt) {
         this.id = id;
-        this.username = username;
+        this.name = name;
+        this.nickname = nickname;
         this.email = email;
         this.role = role;
-        this.profile_image = profile_image;
+        this.profilepic = profilepic;
+        this.phone = phone;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -21,13 +24,14 @@ class UserDto {
  * DTO for creating a user
  */
 class CreateUserDto {
-    constructor(name, nickname, email, password, role, profile_image) {
+    constructor(name, nickname, email, password, role = 'user', profilepic = null, phone = null) {
         this.name = name;
         this.nickname = nickname;
         this.email = email;
         this.password = password;
         this.role = role;
-        this.profile_image = profile_image;
+        this.profilepic = profilepic;
+        this.phone = phone;
     }
 }
 
@@ -36,11 +40,13 @@ class CreateUserDto {
  */
 class UpdateUserDto {
     constructor(data = {}) {
-        if (data.username !== undefined) this.username = data.username;
+        if (data.name !== undefined) this.name = data.name;
+        if (data.nickname !== undefined) this.nickname = data.nickname;
         if (data.email !== undefined) this.email = data.email;
         if (data.password !== undefined) this.password = data.password;
         if (data.role !== undefined) this.role = data.role;
-        if (data.profile_image !== undefined) this.profile_image = data.profile_image;
+        if (data.profilepic !== undefined) this.profilepic = data.profilepic;
+        if (data.phone !== undefined) this.phone = data.phone;
     }
 }
 

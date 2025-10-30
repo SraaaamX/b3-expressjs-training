@@ -1,9 +1,9 @@
 /**
  * Mappers for inquiries
+ * These mappers convert between model objects and DTOs
  */
 
-// No need to import DTOs as we define our own mapping functions
-// that directly return objects in the expected format
+const { InquiryDto, CreateInquiryDto, UpdateInquiryDto } = require('../dtos/inquiriesDtos');
 
 /**
  * Converts an inquiry object into an API response DTO
@@ -11,19 +11,19 @@
 const toInquiryDto = (inquiry) => {
     if (!inquiry) return null;
     
-    return {
-        id: inquiry._id,
-        property_id: inquiry.property_id,
-        user_id: inquiry.user_id,
-        inquiry_type: inquiry.inquiry_type,
-        message: inquiry.message,
-        preferred_date: inquiry.preferred_date,
-        preferred_time: inquiry.preferred_time,
-        status: inquiry.status,
-        agent_response: inquiry.agent_response,
-        createdAt: inquiry.createdAt,
-        updatedAt: inquiry.updatedAt
-    };
+    return new InquiryDto(
+        inquiry._id,
+        inquiry.user_id,
+        inquiry.property_id,
+        inquiry.inquiry_type,
+        inquiry.message,
+        inquiry.preferred_date,
+        inquiry.preferred_time,
+        inquiry.status,
+        inquiry.agent_response,
+        inquiry.createdAt,
+        inquiry.updatedAt
+    );
 };
 
 /**
@@ -40,13 +40,14 @@ const toInquiryDtoList = (inquiries) => {
  */
 const fromCreateInquiryDto = (createInquiryDto) => {
     return {
-        property_id: createInquiryDto.property_id,
         user_id: createInquiryDto.user_id,
+        property_id: createInquiryDto.property_id,
         inquiry_type: createInquiryDto.inquiry_type,
         message: createInquiryDto.message,
         preferred_date: createInquiryDto.preferred_date,
         preferred_time: createInquiryDto.preferred_time,
-        status: createInquiryDto.status || 'pending'
+        status: createInquiryDto.status || 'pending',
+        agent_response: createInquiryDto.agent_response
     };
 };
 
@@ -56,8 +57,6 @@ const fromCreateInquiryDto = (createInquiryDto) => {
 const fromUpdateInquiryDto = (updateInquiryDto) => {
     const updateData = {};
     
-    if (updateInquiryDto.property_id !== undefined) updateData.property_id = updateInquiryDto.property_id;
-    if (updateInquiryDto.user_id !== undefined) updateData.user_id = updateInquiryDto.user_id;
     if (updateInquiryDto.inquiry_type !== undefined) updateData.inquiry_type = updateInquiryDto.inquiry_type;
     if (updateInquiryDto.message !== undefined) updateData.message = updateInquiryDto.message;
     if (updateInquiryDto.preferred_date !== undefined) updateData.preferred_date = updateInquiryDto.preferred_date;

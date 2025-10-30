@@ -1,5 +1,6 @@
 /**
  * Property mappers
+ * These mappers convert between model objects and DTOs
  */
 
 const { PropertyDto, CreatePropertyDto, UpdatePropertyDto } = require('../dtos/propertiesDtos');
@@ -23,6 +24,17 @@ const toPropertyDto = (property) => {
         property.postal_code,
         property.surface_area,
         property.rooms,
+        property.bedrooms,
+        property.bathrooms,
+        property.parking,
+        property.garden,
+        property.balcony,
+        property.elevator,
+        property.construction_year,
+        property.availability_date,
+        property.featured,
+        property.status,
+        property.agent_id,
         property.createdAt,
         property.updatedAt
     );
@@ -52,7 +64,18 @@ const fromCreatePropertyDto = (createPropertyDto) => {
         city: createPropertyDto.city,
         postal_code: createPropertyDto.postal_code,
         surface_area: createPropertyDto.surface_area,
-        rooms: createPropertyDto.rooms
+        rooms: createPropertyDto.rooms,
+        bedrooms: createPropertyDto.bedrooms,
+        bathrooms: createPropertyDto.bathrooms,
+        parking: createPropertyDto.parking,
+        garden: createPropertyDto.garden,
+        balcony: createPropertyDto.balcony,
+        elevator: createPropertyDto.elevator,
+        construction_year: createPropertyDto.construction_year,
+        availability_date: createPropertyDto.availability_date,
+        featured: createPropertyDto.featured,
+        status: createPropertyDto.status,
+        agent_id: createPropertyDto.agent_id
     };
 };
 
@@ -73,6 +96,17 @@ const fromUpdatePropertyDto = (updatePropertyDto) => {
     if (updatePropertyDto.postal_code !== undefined) updateData.postal_code = updatePropertyDto.postal_code;
     if (updatePropertyDto.surface_area !== undefined) updateData.surface_area = updatePropertyDto.surface_area;
     if (updatePropertyDto.rooms !== undefined) updateData.rooms = updatePropertyDto.rooms;
+    if (updatePropertyDto.bedrooms !== undefined) updateData.bedrooms = updatePropertyDto.bedrooms;
+    if (updatePropertyDto.bathrooms !== undefined) updateData.bathrooms = updatePropertyDto.bathrooms;
+    if (updatePropertyDto.parking !== undefined) updateData.parking = updatePropertyDto.parking;
+    if (updatePropertyDto.garden !== undefined) updateData.garden = updatePropertyDto.garden;
+    if (updatePropertyDto.balcony !== undefined) updateData.balcony = updatePropertyDto.balcony;
+    if (updatePropertyDto.elevator !== undefined) updateData.elevator = updatePropertyDto.elevator;
+    if (updatePropertyDto.construction_year !== undefined) updateData.construction_year = updatePropertyDto.construction_year;
+    if (updatePropertyDto.availability_date !== undefined) updateData.availability_date = updatePropertyDto.availability_date;
+    if (updatePropertyDto.featured !== undefined) updateData.featured = updatePropertyDto.featured;
+    if (updatePropertyDto.status !== undefined) updateData.status = updatePropertyDto.status;
+    if (updatePropertyDto.agent_id !== undefined) updateData.agent_id = updatePropertyDto.agent_id;
     
     return updateData;
 };

@@ -1,5 +1,4 @@
 const propertiesService = require('../services/propertiesServices');
-const { toPropertyDto, toPropertyDtoList, fromCreatePropertyDto, fromUpdatePropertyDto } = require('../mappers/propertiesMappers');
 
 // Get all properties
 exports.getAllProperties = async (req, res) => {

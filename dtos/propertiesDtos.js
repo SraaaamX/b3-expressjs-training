@@ -1,5 +1,6 @@
 /**
  * DTOs for properties
+ * These DTOs are designed to match the property model structure
  */
 
 /**
@@ -7,7 +8,9 @@
  */
 class PropertyDto {
     constructor(id, title, image, description, price, property_type, transaction_type, 
-                address, city, postal_code, surface_area, rooms, createdAt, updatedAt) {
+                address, city, postal_code, surface_area, rooms, bedrooms, bathrooms,
+                parking, garden, balcony, elevator, construction_year, availability_date,
+                featured, status, agent_id, createdAt, updatedAt) {
         this.id = id;
         this.title = title;
         this.image = image;
@@ -20,6 +23,17 @@ class PropertyDto {
         this.postal_code = postal_code;
         this.surface_area = surface_area;
         this.rooms = rooms;
+        this.bedrooms = bedrooms;
+        this.bathrooms = bathrooms;
+        this.parking = parking;
+        this.garden = garden;
+        this.balcony = balcony;
+        this.elevator = elevator;
+        this.construction_year = construction_year;
+        this.availability_date = availability_date;
+        this.featured = featured;
+        this.status = status;
+        this.agent_id = agent_id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -30,7 +44,9 @@ class PropertyDto {
  */
 class CreatePropertyDto {
     constructor(title, image, description, price, property_type, transaction_type, 
-                address, city, postal_code, surface_area, rooms) {
+                address, city, postal_code, surface_area, rooms, bedrooms, bathrooms,
+                parking, garden, balcony, elevator, construction_year, availability_date,
+                featured, status, agent_id) {
         this.title = title;
         this.image = image;
         this.description = description;
@@ -42,6 +58,17 @@ class CreatePropertyDto {
         this.postal_code = postal_code;
         this.surface_area = surface_area;
         this.rooms = rooms;
+        this.bedrooms = bedrooms;
+        this.bathrooms = bathrooms;
+        this.parking = parking;
+        this.garden = garden;
+        this.balcony = balcony;
+        this.elevator = elevator;
+        this.construction_year = construction_year;
+        this.availability_date = availability_date;
+        this.featured = featured;
+        this.status = status;
+        this.agent_id = agent_id;
     }
 }
 
@@ -61,6 +88,17 @@ class UpdatePropertyDto {
         if (data.postal_code !== undefined) this.postal_code = data.postal_code;
         if (data.surface_area !== undefined) this.surface_area = data.surface_area;
         if (data.rooms !== undefined) this.rooms = data.rooms;
+        if (data.bedrooms !== undefined) this.bedrooms = data.bedrooms;
+        if (data.bathrooms !== undefined) this.bathrooms = data.bathrooms;
+        if (data.parking !== undefined) this.parking = data.parking;
+        if (data.garden !== undefined) this.garden = data.garden;
+        if (data.balcony !== undefined) this.balcony = data.balcony;
+        if (data.elevator !== undefined) this.elevator = data.elevator;
+        if (data.construction_year !== undefined) this.construction_year = data.construction_year;
+        if (data.availability_date !== undefined) this.availability_date = data.availability_date;
+        if (data.featured !== undefined) this.featured = data.featured;
+        if (data.status !== undefined) this.status = data.status;
+        if (data.agent_id !== undefined) this.agent_id = data.agent_id;
     }
 }
 

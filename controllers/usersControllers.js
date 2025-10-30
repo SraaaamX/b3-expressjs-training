@@ -1,5 +1,4 @@
 const usersService = require('../services/usersServices');
-const { toUserDto, toUserDtoList, fromCreateUserDto, fromUpdateUserDto } = require('../mappers/usersMappers');
 
 // Retrieve every user from the system
 exports.getAllUsers = async (req, res) => {
