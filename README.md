@@ -9,6 +9,7 @@ The Real Estate API is a comprehensive backend solution built with Express.js fo
 - Inquiry system for property visits and information requests
 - File upload system for user avatars and property images
 - Standardized API responses for consistent client integration
+- Interactive API documentation with Swagger UI
 
 This project follows the MVC (Model-View-Controller) architecture pattern and implements RESTful API principles to ensure scalability and maintainability.
 
@@ -19,7 +20,8 @@ b3-expressjs-training/
 ├── config/                # Configuration files
 │   ├── database/          # Database configuration
 │   ├── routes/            # Routes configuration
-│   └── server/            # Server configuration
+│   ├── server/            # Server configuration
+│   └── swagger/           # Swagger API documentation configuration
 ├── controllers/           # Business logic for handling requests
 │   ├── inquiriesControllers.js
 │   ├── propertiesControllers.js
@@ -75,3 +77,26 @@ b3-expressjs-training/
 - [Access Management](docs/access-management.md)
 - [API Documentation](docs/api-documentation.md)
 - [Postman Collection](docs/postman-json/)
+- [Swagger Documentation](docs/swagger-documentation.md)
+
+## Swagger Documentation
+
+The project includes comprehensive API documentation using Swagger UI. This provides an interactive interface to explore and test all available endpoints.
+
+### Features
+- Complete documentation of all API endpoints
+- Request and response schemas
+- Interactive testing capability
+- Authentication support for protected endpoints
+
+### Accessing Swagger UI
+Once the server is running, access the Swagger documentation at:
+```
+http://localhost:3000/api-docs
+```
+
+### Authentication in Swagger
+For protected endpoints, use the Authorize button in Swagger UI and enter your JWT token in the format:
+```
+Bearer your-jwt-token
+```

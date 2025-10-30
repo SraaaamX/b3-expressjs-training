@@ -1,5 +1,20 @@
 # API Documentation
 
+## Interactive Documentation with Swagger UI
+
+The API includes interactive documentation using Swagger UI, which provides a user-friendly interface to explore and test all available endpoints.
+
+### Accessing Swagger UI
+- **URL**: `/api-docs`
+- **Method**: `GET`
+- **Authorization**: None (public)
+
+Swagger UI provides:
+- Complete documentation of all API endpoints
+- Request and response schemas
+- Interactive testing capability
+- Authentication support for protected endpoints
+
 ## Data Architecture
 
 The API uses a layered architecture with:

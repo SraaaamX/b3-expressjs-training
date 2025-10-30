@@ -8,10 +8,14 @@ require('dotenv').config();
 const connectDB = require('./config/database/db.config');
 const { configureServer, getPort } = require('./config/server/server.config');
 const registerRoutes = require('./config/routes/routes.config');
+const setupSwagger = require('./config/swagger/swagger.config');
 
 // Initialize Express app with configurations
 const app = configureServer();
 const port = getPort();
+
+// Setup Swagger documentation
+setupSwagger(app);
 
 // Register all application routes
 registerRoutes(app);
