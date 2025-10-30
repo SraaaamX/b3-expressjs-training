@@ -7,7 +7,7 @@ const { toUserDto, toUserDtoList, fromCreateUserDto, fromUpdateUserDto } = requi
 
 class UsersService {
     /**
-     * Récupère tous les utilisateurs (sans les mots de passe)
+     * Retrieves all users without their passwords
      */
     async getAllUsers() {
         const users = await Users.find().select('-password');
@@ -17,8 +17,11 @@ class UsersService {
         return toUserDtoList(users);
     }
 
+    /**
+     * Retrieves a single user by ID with permission checks
+     */
     async getUserById(userId, requestingUser) {
-        // Vérification des permissions
+        // Permission verification
         const isAdmin = requestingUser.role === 'admin';
         const isSelfQuery = requestingUser.userId === userId;
         
@@ -34,10 +37,13 @@ class UsersService {
         return toUserDto(user);
     }
 
+    /**
+     * Creates a new user with optional profile picture
+     */
     async createUser(userData, uploadedFile = null) {
         const { name, nickname, email, password, role } = userData;
         
-        // Validation des champs requis
+        // Required fields validation
         if (!name || !nickname || !email || !password) {
             if (uploadedFile) {
                 deleteUploadedFile(uploadedFile.path);
@@ -45,7 +51,7 @@ class UsersService {
             throw { status: 400, message: 'All fields are required' };
         }
         
-        // Vérification si l'utilisateur existe déjà
+        // Check if user already exists
         const existingUser = await Users.findOne({ email });
         if (existingUser) {
             if (uploadedFile) {
@@ -54,19 +60,19 @@ class UsersService {
             throw { status: 409, message: 'User with this email already exists' };
         }
         
-        // Préparation des données utilisateur avec le DTO
+        // Prepare user data with DTO
         const userDataDto = fromCreateUserDto(userData);
         userDataDto.password = await bcrypt.hash(password, 10);
         
-        // Ajout de la photo de profil si elle existe
+        // Add profile picture if provided
         if (uploadedFile) {
             userDataDto.profilepic = uploadedFile.url || `/uploads/avatars/${uploadedFile.filename}`;
         }
         
-        // Création de l'utilisateur
+        // Create the user
         const user = await Users.create(userDataDto);
         
-        // Génération du token
+        // Generate token
         const token = jwt.sign(
             { userId: user._id, email: user.email },
             process.env.JWT_SECRET_KEY,
@@ -76,25 +82,28 @@ class UsersService {
         return { user: toUserDto(user), token };
     }
 
+    /**
+     * Authenticates a user and returns a JWT token
+     */
     async loginUser(email, password) {
-        // Validation des champs requis
+        // Required fields validation
         if (!email || !password) {
             throw { status: 400, message: 'All fields are required' };
         }
         
-        // Recherche de l'utilisateur
+        // Find the user
         const user = await Users.findOne({ email });
         if (!user) {
             throw { status: 401, message: 'Invalid credentials' };
         }
         
-        // Vérification du mot de passe
+        // Verify password
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             throw { status: 401, message: 'Invalid credentials' };
         }
         
-        // Génération du token
+        // Generate token
         const token = jwt.sign(
             { userId: user._id, role: user.role },
             process.env.JWT_SECRET_KEY,
@@ -104,8 +113,11 @@ class UsersService {
         return { token };
     }
 
+    /**
+     * Updates user information with permission checks
+     */
     async updateUser(userId, updates, requestingUser, uploadedFile = null) {
-        // Vérification des permissions
+        // Permission verification
         const isAdmin = requestingUser.role === 'admin';
         const isSelfUpdate = requestingUser.userId === userId;
         
@@ -116,25 +128,25 @@ class UsersService {
             throw { status: 403, message: 'Access denied: You can only update your own account' };
         }
         
-        // Préparation des mises à jour
+        // Prepare updates
         const updateData = { ...updates };
         
-        // Hash du mot de passe si présent
+        // Hash password if provided
         if (updateData.password) {
             updateData.password = await bcrypt.hash(updateData.password, 10);
         }
         
-        // Empêcher la modification du rôle si l'utilisateur n'est pas admin
+        // Prevent role modification for non-admin users
         if (!isAdmin && updateData.role) {
             delete updateData.role;
         }
         
-        // Récupération de l'utilisateur actuel pour gérer l'ancienne photo
+        // Get current user to handle old profile picture
         const currentUser = await Users.findById(userId);
         
-        // Gestion de la nouvelle photo de profil
+        // Handle new profile picture
         if (uploadedFile) {
-            // Suppression de l'ancienne photo si elle existe
+            // Delete old picture if exists
             if (currentUser && currentUser.profilepic) {
                 const oldImagePath = path.join(__dirname, '../public', currentUser.profilepic);
                 deleteUploadedFile(oldImagePath);
@@ -143,7 +155,7 @@ class UsersService {
             updateData.profilepic = uploadedFile.url || `/uploads/avatars/${uploadedFile.filename}`;
         }
         
-        // Mise à jour de l'utilisateur
+        // Update the user
         const updatedUser = await Users.findByIdAndUpdate(
             userId,
             updateData,
@@ -160,8 +172,11 @@ class UsersService {
         return updatedUser;
     }
 
+    /**
+     * Deletes a user with permission checks and cleanup
+     */
     async deleteUser(userId, requestingUser) {
-        // Vérification des permissions
+        // Permission verification
         const isAdmin = requestingUser.role === 'admin';
         const isSelfDelete = requestingUser.userId === userId;
         
@@ -169,11 +184,20 @@ class UsersService {
             throw { status: 403, message: 'Access denied: You can only delete your own account' };
         }
         
-        // Suppression de l'utilisateur
-        const userToDelete = await Users.findByIdAndDelete(userId);
+        // Get user before deletion to access profile picture
+        const userToDelete = await Users.findById(userId);
         if (!userToDelete) {
             throw { status: 404, message: 'User not found' };
         }
+        
+        // Delete profile picture if exists
+        if (userToDelete.profilepic) {
+            const profilePicPath = path.join(__dirname, '../public', userToDelete.profilepic);
+            deleteUploadedFile(profilePicPath);
+        }
+        
+        // Delete the user
+        await Users.findByIdAndDelete(userId);
         
         return { message: 'User deleted successfully' };
     }

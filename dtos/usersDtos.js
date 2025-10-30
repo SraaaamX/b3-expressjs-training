@@ -1,9 +1,9 @@
 /**
- * DTOs pour les utilisateurs
+ * User DTOs
  */
 
 /**
- * DTO pour représenter un utilisateur dans les réponses API
+ * DTO representing a user in API responses
  */
 class UserDto {
     constructor(id, username, email, role, profile_image, createdAt, updatedAt) {
@@ -18,11 +18,12 @@ class UserDto {
 }
 
 /**
- * DTO pour la création d'un utilisateur
+ * DTO for creating a user
  */
 class CreateUserDto {
-    constructor(username, email, password, role, profile_image) {
-        this.username = username;
+    constructor(name, nickname, email, password, role, profile_image) {
+        this.name = name;
+        this.nickname = nickname;
         this.email = email;
         this.password = password;
         this.role = role;
@@ -31,7 +32,7 @@ class CreateUserDto {
 }
 
 /**
- * DTO pour la mise à jour d'un utilisateur
+ * DTO for updating a user
  */
 class UpdateUserDto {
     constructor(data = {}) {

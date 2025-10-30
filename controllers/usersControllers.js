@@ -1,6 +1,7 @@
 const usersService = require('../services/usersServices');
 const { toUserDto, toUserDtoList, fromCreateUserDto, fromUpdateUserDto } = require('../mappers/usersMappers');
 
+// Retrieve every user from the system
 exports.getAllUsers = async (req, res) => {
     try {
         const users = await usersService.getAllUsers();
@@ -11,6 +12,7 @@ exports.getAllUsers = async (req, res) => {
     }
 };
 
+// Fetch a single user by its unique identifier
 exports.getUserById = async (req, res) => {
     try {
         const user = await usersService.getUserById(req.params.id, req.user);
@@ -24,6 +26,7 @@ exports.getUserById = async (req, res) => {
     }
 };
 
+// Register a brand-new user with optional profile picture
 exports.createUser = async (req, res) => {
     try {
         const uploadedFile = req.file ? {
@@ -40,6 +43,7 @@ exports.createUser = async (req, res) => {
     }
 };
 
+// Authenticate an existing user and return access credentials
 exports.loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -51,6 +55,7 @@ exports.loginUser = async (req, res) => {
     }
 };
 
+// Modify user details and optionally replace profile picture
 exports.updateUser = async (req, res) => {
     try {
         const uploadedFile = req.file ? {
@@ -76,6 +81,7 @@ exports.updateUser = async (req, res) => {
     }
 };
 
+// Permanently remove a user from the system
 exports.deleteUser = async (req, res) => {
     try {
         const result = await usersService.deleteUser(req.params.id, req.user);

@@ -1,0 +1,88 @@
+{
+  "url": "http://localhost:3000/api/properties",
+  "method": "POST",
+  "header": {
+    "Content-Type": "multipart/form-data",
+    "Authorization": "Bearer {{token}}"
+  },
+  "body": {
+    "mode": "formdata",
+    "formdata": [
+      {
+        "key": "title",
+        "value": "Beautiful apartment in city center",
+        "type": "text"
+      },
+      {
+        "key": "description",
+        "value": "Bright apartment with city view",
+        "type": "text"
+      },
+      {
+        "key": "price",
+        "value": "250000",
+        "type": "text"
+      },
+      {
+        "key": "property_type",
+        "value": "apartment",
+        "type": "text"
+      },
+      {
+        "key": "transaction_type",
+        "value": "sale",
+        "type": "text"
+      },
+      {
+        "key": "address",
+        "value": "123 Paris Street",
+        "type": "text"
+      },
+      {
+        "key": "city",
+        "value": "Paris",
+        "type": "text"
+      },
+      {
+        "key": "postal_code",
+        "value": "75001",
+        "type": "text"
+      },
+      {
+        "key": "surface_area",
+        "value": "75",
+        "type": "text"
+      },
+      {
+        "key": "rooms",
+        "value": "3",
+        "type": "text"
+      },
+      {
+        "key": "bedrooms",
+        "value": "2",
+        "type": "text"
+      },
+      {
+        "key": "bathrooms",
+        "value": "1",
+        "type": "text"
+      },
+      {
+        "key": "parking",
+        "value": "true",
+        "type": "text"
+      },
+      {
+        "key": "balcony",
+        "value": "true",
+        "type": "text"
+      },
+      {
+        "key": "image",
+        "type": "file",
+        "src": "/path/to/your/image.jpg"
+      }
+    ]
+  }
+}

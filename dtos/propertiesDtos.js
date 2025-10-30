@@ -1,9 +1,9 @@
 /**
- * DTOs pour les propriétés
+ * DTOs for properties
  */
 
 /**
- * DTO pour représenter une propriété dans les réponses API
+ * Data transfer object that represents a property when it is sent back to the client
  */
 class PropertyDto {
     constructor(id, title, image, description, price, property_type, transaction_type, 
@@ -26,7 +26,7 @@ class PropertyDto {
 }
 
 /**
- * DTO pour la création d'une propriété
+ * Data transfer object used when a new property is being created
  */
 class CreatePropertyDto {
     constructor(title, image, description, price, property_type, transaction_type, 
@@ -46,7 +46,7 @@ class CreatePropertyDto {
 }
 
 /**
- * DTO pour la mise à jour d'une propriété
+ * Data transfer object that carries only the fields meant to be updated on an existing property
  */
 class UpdatePropertyDto {
     constructor(data = {}) {

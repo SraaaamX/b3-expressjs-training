@@ -1,0 +1,4 @@
+{
+  "url": "http://localhost:3000/api/properties/search?property_type=apartment&transaction_type=sale&min_price=100000&max_price=300000&city=Paris",
+  "method": "GET"
+}

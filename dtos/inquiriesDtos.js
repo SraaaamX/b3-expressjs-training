@@ -1,11 +1,9 @@
 /**
- * DTOs pour les demandes (inquiries)
+ * DTOs for inquiries
  */
 
 /**
- * Convertit un objet demande en DTO pour la réponse API
- * @param {Object} inquiry - L'objet demande à convertir
- * @returns {Object} Le DTO de la demande
+ * Transforms an inquiry object into a response DTO
  */
 const toInquiryDto = (inquiry) => {
     if (!inquiry) return null;
@@ -26,9 +24,7 @@ const toInquiryDto = (inquiry) => {
 };
 
 /**
- * Convertit une liste de demandes en liste de DTOs
- * @param {Array} inquiries - La liste de demandes à convertir
- * @returns {Array} La liste des DTOs demandes
+ * Transforms an array of inquiries into an array of DTOs
  */
 const toInquiryDtoList = (inquiries) => {
     if (!inquiries || !Array.isArray(inquiries)) return [];
@@ -37,9 +33,7 @@ const toInquiryDtoList = (inquiries) => {
 };
 
 /**
- * Prépare un objet pour la création d'une demande
- * @param {Object} inquiryData - Les données de la demande à créer
- * @returns {Object} L'objet préparé pour la création
+ * Prepares an object for inquiry creation
  */
 const fromCreateInquiryDto = (inquiryData) => {
     return {
@@ -55,9 +49,7 @@ const fromCreateInquiryDto = (inquiryData) => {
 };
 
 /**
- * Prépare un objet pour la mise à jour d'une demande
- * @param {Object} inquiryData - Les données de la demande à mettre à jour
- * @returns {Object} L'objet préparé pour la mise à jour
+ * Prepares an object for inquiry update
  */
 const fromUpdateInquiryDto = (inquiryData) => {
     const updateData = {};

@@ -3,7 +3,7 @@ const { toInquiryDto, toInquiryDtoList, fromCreateInquiryDto, fromUpdateInquiryD
 
 class InquiriesService {
     /**
-     * Récupère toutes les demandes
+     * Retrieves all inquiries from the database
      */
     async getAllInquiries() {
         const inquiries = await Inquiries.find();
@@ -13,6 +13,9 @@ class InquiriesService {
         return toInquiryDtoList(inquiries);
     }
 
+    /**
+     * Retrieves a single inquiry by its unique identifier
+     */
     async getInquiryById(inquiryId) {
         const inquiry = await Inquiries.findById(inquiryId);
         if (!inquiry) {
@@ -21,6 +24,9 @@ class InquiriesService {
         return toInquiryDto(inquiry);
     }
 
+    /**
+     * Creates a new inquiry after validating required fields
+     */
     async createInquiry(inquiryData) {
         const { user_id, property_id, inquiry_type } = inquiryData;
 
@@ -34,6 +40,9 @@ class InquiriesService {
         return toInquiryDto(newInquiry);
     }
 
+    /**
+     * Updates an existing inquiry with the provided changes
+     */
     async updateInquiry(inquiryId, updates) {
         const updateData = fromUpdateInquiryDto(updates);
         
@@ -50,6 +59,9 @@ class InquiriesService {
         return toInquiryDto(updatedInquiry);
     }
 
+    /**
+     * Removes an inquiry from the database
+     */
     async deleteInquiry(inquiryId) {
         const deletedInquiry = await Inquiries.findByIdAndDelete(inquiryId);
 
@@ -60,6 +72,9 @@ class InquiriesService {
         return { message: 'Inquiry deleted successfully' };
     }
 
+    /**
+     * Retrieves all inquiries associated with a specific user
+     */
     async getInquiriesByUser(userId) {
         const inquiries = await Inquiries.find({ user_id: userId });
 
@@ -70,6 +85,9 @@ class InquiriesService {
         return toInquiryDtoList(inquiries);
     }
 
+    /**
+     * Retrieves all inquiries related to a particular property
+     */
     async getInquiriesByProperty(propertyId) {
         const inquiries = await Inquiries.find({ property_id: propertyId });
 
@@ -80,6 +98,9 @@ class InquiriesService {
         return toInquiryDtoList(inquiries);
     }
 
+    /**
+     * Updates the status of an inquiry to one of the predefined values
+     */
     async updateInquiryStatus(inquiryId, status) {
         const validStatuses = ['pending', 'confirmed', 'completed', 'cancelled'];
 
@@ -100,6 +121,9 @@ class InquiriesService {
         return toInquiryDto(inquiry);
     }
 
+    /**
+     * Adds or updates the agent's response for a given inquiry
+     */
     async addAgentResponse(inquiryId, agentResponse) {
         if (!agentResponse) {
             throw { status: 400, message: 'Agent response is required' };
@@ -120,5 +144,3 @@ class InquiriesService {
 }
 
 module.exports = new InquiriesService();
-
-

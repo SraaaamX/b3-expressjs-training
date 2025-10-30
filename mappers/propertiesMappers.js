@@ -1,13 +1,11 @@
 /**
- * Mappers pour les propriétés
+ * Property mappers
  */
 
 const { PropertyDto, CreatePropertyDto, UpdatePropertyDto } = require('../dtos/propertiesDtos');
 
 /**
- * Convertit un objet propriété en DTO pour la réponse API
- * @param {Object} property - L'objet propriété à convertir
- * @returns {PropertyDto} Le DTO de la propriété
+ * Converts a property object to a DTO for API response
  */
 const toPropertyDto = (property) => {
     if (!property) return null;
@@ -31,9 +29,7 @@ const toPropertyDto = (property) => {
 };
 
 /**
- * Convertit une liste de propriétés en liste de DTOs
- * @param {Array} properties - La liste de propriétés à convertir
- * @returns {Array<PropertyDto>} La liste des DTOs propriétés
+ * Converts a list of properties to a list of DTOs
  */
 const toPropertyDtoList = (properties) => {
     if (!properties || !Array.isArray(properties)) return [];
@@ -42,9 +38,7 @@ const toPropertyDtoList = (properties) => {
 };
 
 /**
- * Prépare un objet pour la création d'une propriété
- * @param {CreatePropertyDto} createPropertyDto - Les données de la propriété à créer
- * @returns {Object} L'objet préparé pour la création
+ * Prepares an object for property creation
  */
 const fromCreatePropertyDto = (createPropertyDto) => {
     return {
@@ -63,9 +57,7 @@ const fromCreatePropertyDto = (createPropertyDto) => {
 };
 
 /**
- * Prépare un objet pour la mise à jour d'une propriété
- * @param {UpdatePropertyDto} updatePropertyDto - Les données de la propriété à mettre à jour
- * @returns {Object} L'objet préparé pour la mise à jour
+ * Prepares an object for property update
  */
 const fromUpdatePropertyDto = (updatePropertyDto) => {
     const updateData = {};

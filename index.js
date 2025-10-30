@@ -1,31 +1,36 @@
+/**
+ * Main application entry point
+ * Initializes and starts the Express server with all configurations
+ */
 require('dotenv').config();
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const userRoutes = require('./routes/usersRoutes');
 
-const app = express();
-const port = process.env.PORT;
+// Import configuration modules
+const connectDB = require('./config/database/db.config');
+const { configureServer, getPort } = require('./config/server/server.config');
+const registerRoutes = require('./config/routes/routes.config');
 
-//Middleware
-app.use(cors());
-app.use(express.json());
+// Initialize Express app with configurations
+const app = configureServer();
+const port = getPort();
 
-app.use('/api/users', userRoutes);
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/properties', require('./routes/propertiesRoutes'));
-app.use('/api/inquiries', require('./routes/inquiriesRoutes'));
+// Register all application routes
+registerRoutes(app);
 
-//Connect to DB
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => {
-        console.log('Connected to DB');
-    })
-    .catch((error) => {
-        console.log(error);
+// Connect to database and start server
+const startServer = async () => {
+  try {
+    // Connect to MongoDB
+    await connectDB();
+    
+    // Start Express server
+    app.listen(port, () => {
+      console.log(`Server running at http://localhost:${port}`);
     });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
 
-
-app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
-});
+// Start the application
+startServer();

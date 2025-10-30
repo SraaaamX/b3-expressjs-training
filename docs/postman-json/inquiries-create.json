@@ -1,0 +1,15 @@
+{
+  "url": "http://localhost:3000/api/inquiries",
+  "method": "POST",
+  "header": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer {{token}}"
+  },
+  "body": {
+    "user_id": "{{userId}}",
+    "property_id": "{{propertyId}}",
+    "inquiry_type": "visit_request",
+    "message": "I would like to visit this property as soon as possible",
+    "preferred_date": "2023-12-15T10:00:00.000Z"
+  }
+}

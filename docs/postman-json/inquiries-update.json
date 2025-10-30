@@ -1,0 +1,12 @@
+{
+  "url": "http://localhost:3000/api/inquiries/{{inquiryId}}",
+  "method": "PUT",
+  "header": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer {{token}}"
+  },
+  "body": {
+    "preferred_date": "2023-12-16T14:00:00.000Z",
+    "preferred_time": "14:00"
+  }
+}

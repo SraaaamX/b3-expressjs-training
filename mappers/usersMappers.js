@@ -1,13 +1,11 @@
 /**
- * Mappers pour les utilisateurs
+ * User mappers
  */
 
 const { UserDto, CreateUserDto, UpdateUserDto } = require('../dtos/usersDtos');
 
 /**
- * Convertit un objet utilisateur en DTO pour la réponse API
- * @param {Object} user - L'objet utilisateur à convertir
- * @returns {UserDto} Le DTO de l'utilisateur
+ * Converts a user object into an API response DTO
  */
 const toUserDto = (user) => {
     if (!user) return null;
@@ -24,9 +22,7 @@ const toUserDto = (user) => {
 };
 
 /**
- * Convertit une liste d'utilisateurs en liste de DTOs
- * @param {Array} users - La liste d'utilisateurs à convertir
- * @returns {Array<UserDto>} La liste des DTOs utilisateurs
+ * Converts a list of users into a list of DTOs
  */
 const toUserDtoList = (users) => {
     if (!users || !Array.isArray(users)) return [];
@@ -35,13 +31,12 @@ const toUserDtoList = (users) => {
 };
 
 /**
- * Prépare un objet pour la création d'un utilisateur
- * @param {CreateUserDto} createUserDto - Les données de l'utilisateur à créer
- * @returns {Object} L'objet préparé pour la création
+ * Prepares an object for user creation
  */
 const fromCreateUserDto = (createUserDto) => {
     return {
-        name: createUserDto.username,
+        name: createUserDto.name || createUserDto.username,
+        nickname: createUserDto.nickname,
         email: createUserDto.email,
         password: createUserDto.password,
         role: createUserDto.role || 'user',
@@ -50,9 +45,7 @@ const fromCreateUserDto = (createUserDto) => {
 };
 
 /**
- * Prépare un objet pour la mise à jour d'un utilisateur
- * @param {UpdateUserDto} updateUserDto - Les données de l'utilisateur à mettre à jour
- * @returns {Object} L'objet préparé pour la mise à jour
+ * Prepares an object for user update
  */
 const fromUpdateUserDto = (updateUserDto) => {
     const updateData = {};

@@ -5,7 +5,7 @@ const { toPropertyDto, toPropertyDtoList, fromCreatePropertyDto, fromUpdatePrope
 
 class PropertiesService {
     /**
-     * Récupère toutes les propriétés
+     * Retrieves all properties from the database
      */
     async getAllProperties() {
         const properties = await Properties.find();
@@ -15,6 +15,9 @@ class PropertiesService {
         return toPropertyDtoList(properties);
     }
 
+    /**
+     * Retrieves a single property by its unique identifier
+     */
     async getPropertyById(propertyId) {
         const property = await Properties.findById(propertyId);
         if (!property) {
@@ -23,10 +26,13 @@ class PropertiesService {
         return toPropertyDto(property);
     }
 
+    /**
+     * Creates a new property with the provided data and optional image
+     */
     async createProperty(propertyData, uploadedFile = null) {
         const { title, price, property_type, transaction_type, address, city } = propertyData;
         
-        // Validation des champs obligatoires
+        // Validation of mandatory fields
         if (!title || !price || !property_type || !transaction_type || !address || !city) {
             if (uploadedFile) {
                 deleteUploadedFile(uploadedFile.path);
@@ -36,7 +42,7 @@ class PropertiesService {
         
         const newPropertyData = fromCreatePropertyDto(propertyData);
         
-        // Ajout de l'image si elle existe
+        // Addition of the image if it exists
         if (uploadedFile) {
             newPropertyData.image = uploadedFile.url || `/uploads/properties/${uploadedFile.filename}`;
         }
@@ -45,15 +51,18 @@ class PropertiesService {
         return toPropertyDto(newProperty);
     }
 
+    /**
+     * Updates an existing property with new data and optionally replaces its image
+     */
     async updateProperty(propertyId, updates, uploadedFile = null) {
         const updateData = fromUpdatePropertyDto(updates);
         
-        // Récupération de la propriété actuelle pour gérer l'ancienne image
+        // Retrieval of the current property to handle the old image
         const currentProperty = await Properties.findById(propertyId);
         
-        // Gestion de la nouvelle image
+        // Handling of the new image
         if (uploadedFile) {
-            // Suppression de l'ancienne image si elle existe
+            // Deletion of the old image if it exists
             if (currentProperty && currentProperty.image) {
                 const oldImagePath = path.join(__dirname, '../public', currentProperty.image);
                 deleteUploadedFile(oldImagePath);
@@ -62,7 +71,7 @@ class PropertiesService {
             updateData.image = uploadedFile.url || `/uploads/properties/${uploadedFile.filename}`;
         }
         
-        // Mise à jour de la propriété
+        // Update of the property
         const updatedProperty = await Properties.findByIdAndUpdate(
             propertyId,
             updateData,
@@ -80,8 +89,7 @@ class PropertiesService {
     }
 
     /**
-     * Supprime une propriété
-     * @param {string} propertyId - ID de la propriété
+     * Deletes a property and its associated image
      */
     async deleteProperty(propertyId) {
         const deletedProperty = await Properties.findByIdAndDelete(propertyId);
@@ -90,9 +98,18 @@ class PropertiesService {
             throw { status: 404, message: 'Property not found' };
         }
         
+        // Deletion of the associated image if it exists
+        if (deletedProperty.image) {
+            const imagePath = path.join(__dirname, '../public', deletedProperty.image);
+            deleteUploadedFile(imagePath);
+        }
+        
         return { message: 'Property deleted successfully' };
     }
 
+    /**
+     * Searches for properties matching the given criteria
+     */
     async searchProperties(searchCriteria) {
         const { 
             property_type, 
@@ -136,6 +153,9 @@ class PropertiesService {
         return properties;
     }
 
+    /**
+     * Toggles the featured status of a property
+     */
     async toggleFeatured(propertyId) {
         const property = await Properties.findById(propertyId);
         
@@ -149,6 +169,9 @@ class PropertiesService {
         return property;
     }
 
+    /**
+     * Updates the status of a property to one of the predefined values
+     */
     async updateStatus(propertyId, status) {
         const validStatuses = ['available', 'sold', 'rented', 'pending'];
         
