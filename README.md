@@ -61,15 +61,65 @@ b3-expressjs-training/
 │   ├── inquiriesServices.js
 │   ├── propertiesServices.js
 │   └── usersServices.js
+├── .dockerignore          # Docker ignore file
 ├── .env.example           # Environment variables template
+├── docker-compose.yml     # Docker Compose configuration
+├── Dockerfile             # Docker image definition
 ├── index.js               # Application entry point
 ├── package.json           # Project dependencies and scripts
 └── README.md              # Project overview
 ```
 
+## Quick Start with Docker
+
+The easiest way to run this project is using Docker. This will automatically set up the application and MongoDB database.
+
+### Prerequisites
+- Docker and Docker Compose installed on your system
+
+### Running with Docker
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd b3-expressjs-training
+   ```
+
+2. **Start the application**
+   ```bash
+   docker-compose up -d
+   ```
+
+3. **Access the API**
+   - API: http://localhost:3000
+   - Swagger Documentation: http://localhost:3000/api-docs
+
+4. **View logs**
+   ```bash
+   docker-compose logs -f
+   ```
+
+5. **Stop the application**
+   ```bash
+   docker-compose down
+   ```
+
+### Docker Services
+
+The Docker setup includes:
+- **app**: Express.js application (Node.js 20)
+- **mongo**: MongoDB 7 database with persistent storage
+
+### MongoDB Connection
+
+- **From host machine (MongoDB Compass)**: `mongodb://localhost:27017`
+- **Database name**: `b3-expressjs-training`
+- **From application**: Automatically configured via Docker Compose
+
 ## Table of Contents
 
 - [Installation](docs/installation.md)
+- [Docker Guide](docs/docker.md)
 - [Architecture](docs/architecture.md)
 - [Data Models](docs/data-models.md)
 - [File Upload System](docs/file-upload.md)
