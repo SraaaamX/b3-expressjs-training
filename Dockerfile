@@ -8,10 +8,13 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm install --omit=dev
 
 # Copy application files
 COPY . .
+
+# Set environment variable
+ENV NODE_ENV=production
 
 # Expose the port
 EXPOSE 3000

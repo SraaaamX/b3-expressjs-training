@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  app:
+  api:
     build: .
-    container_name: expressjs-app
+    container_name: expressjs-api
     ports:
       - "3000:3000"
     environment:
