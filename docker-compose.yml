@@ -1,28 +1,43 @@
-version: '3.8'
-
 services:
-  api:
-    build: .
-    container_name: expressjs-api
-    ports:
-      - "3000:3000"
-    environment:
-      - PORT=3000
-      - MONGO_URI=mongodb://mongo:27017/b3-expressjs-training
-    depends_on:
-      - mongo
-    volumes:
-      - .:/app
-      - /app/node_modules
-    restart: unless-stopped
 
   mongo:
-    image: mongo:7
+    image: mongo:latest
     container_name: mongodb
     ports:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: expressjs-api
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - MONGO_URI=mongodb://mongo:27017/realestate
+      - JWT_SECRET_KEY=your-super-secret-jwt-key-yeaaaaah
+      - JWT_EXPIRES_IN=24h
+      - NODE_ENV=development
+    depends_on:
+      - mongo
+    restart: unless-stopped
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: react-client
+    environment:
+      - VITE_API_URI=http://api:3000/api/
+      - VITE_ENV=development
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
     restart: unless-stopped
 
 volumes:

@@ -1,0 +1,845 @@
+{
+	"info": {
+		"_postman_id": "b3-expressjs-real-estate-api-v2",
+		"name": "Real Estate API - Complete Collection (CORRECTED)",
+		"description": "Collection complète corrigée basée sur les modèles réels de l'API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "property_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "inquiry_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.id) {",
+									"        pm.collectionVariables.set('user_id', response.data.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "John Doe",
+									"type": "text",
+									"description": "Full name (required)"
+								},
+								{
+									"key": "nickname",
+									"value": "johndoe",
+									"type": "text",
+									"description": "Unique nickname (required)"
+								},
+								{
+									"key": "email",
+									"value": "john.doe@example.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Password123!",
+									"type": "text",
+									"description": "Min 8 chars, 1 uppercase, 1 lowercase, 1 number"
+								},
+								{
+									"key": "role",
+									"value": "user",
+									"type": "text",
+									"description": "Options: user, agent, admin"
+								},
+								{
+									"key": "phone",
+									"value": "+33612345678",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "profilepic",
+									"type": "file",
+									"src": [],
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Créer un nouveau compte utilisateur"
+					},
+					"response": []
+				},
+				{
+					"name": "Register Agent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.id) {",
+									"        pm.collectionVariables.set('user_id', response.data.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Jane Smith",
+									"type": "text",
+									"description": "Full name (required)"
+								},
+								{
+									"key": "nickname",
+									"value": "janesmith",
+									"type": "text",
+									"description": "Unique nickname (required)"
+								},
+								{
+									"key": "email",
+									"value": "agent@example.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "AgentPass123!",
+									"type": "text"
+								},
+								{
+									"key": "role",
+									"value": "agent",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "+33698765432",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Créer un compte agent immobilier"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.token) {",
+									"        pm.collectionVariables.set('auth_token', response.data.token);",
+									"    }",
+									"    if (response.data && response.data.user && response.data.user.id) {",
+									"        pm.collectionVariables.set('user_id', response.data.user.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john.doe@example.com\",\n    \"password\": \"Password123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Se connecter et obtenir un token JWT"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints d'authentification"
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get All Users (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Récupérer tous les utilisateurs (Admin uniquement)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{user_id}}"
+							]
+						},
+						"description": "Récupérer un utilisateur par son ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "John Doe Updated",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "nickname",
+									"value": "johndoe_updated",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "email",
+									"value": "john.updated@example.com",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "phone",
+									"value": "+33612345678",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "profilepic",
+									"type": "file",
+									"src": [],
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{user_id}}"
+							]
+						},
+						"description": "Mettre à jour les informations d'un utilisateur"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{user_id}}"
+							]
+						},
+						"description": "Supprimer un utilisateur"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de gestion des utilisateurs"
+		},
+		{
+			"name": "Properties",
+			"item": [
+				{
+					"name": "Get All Properties",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/properties",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties"
+							]
+						},
+						"description": "Récupérer toutes les propriétés (public)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Property by ID",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/properties/{{property_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"{{property_id}}"
+							]
+						},
+						"description": "Récupérer une propriété par son ID (public)"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Property",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.id) {",
+									"        pm.collectionVariables.set('property_id', response.data.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Appartement moderne avec vue sur la Tour Eiffel",
+									"type": "text",
+									"description": "Min 5 chars, max 100"
+								},
+								{
+									"key": "description",
+									"value": "Magnifique appartement de 85m² situé au cœur de Paris, avec une vue imprenable sur la Tour Eiffel. Entièrement rénové avec des matériaux de qualité.",
+									"type": "text",
+									"description": "Min 20 chars, max 2000"
+								},
+								{
+									"key": "price",
+									"value": "450000",
+									"type": "text",
+									"description": "Prix en euros"
+								},
+								{
+									"key": "property_type",
+									"value": "apartment",
+									"type": "text",
+									"description": "Options: house, apartment, villa, studio, office, land"
+								},
+								{
+									"key": "transaction_type",
+									"value": "sale",
+									"type": "text",
+									"description": "Options: sale, rent"
+								},
+								{
+									"key": "address",
+									"value": "15 Avenue de la Bourdonnais",
+									"type": "text"
+								},
+								{
+									"key": "city",
+									"value": "Paris",
+									"type": "text"
+								},
+								{
+									"key": "postal_code",
+									"value": "75007",
+									"type": "text"
+								},
+								{
+									"key": "surface_area",
+									"value": "85",
+									"type": "text",
+									"description": "Surface en m²"
+								},
+								{
+									"key": "rooms",
+									"value": "3",
+									"type": "text",
+									"description": "Nombre total de pièces"
+								},
+								{
+									"key": "bedrooms",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "bathrooms",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "parking",
+									"value": "true",
+									"type": "text",
+									"description": "Boolean"
+								},
+								{
+									"key": "garden",
+									"value": "false",
+									"type": "text",
+									"description": "Boolean"
+								},
+								{
+									"key": "balcony",
+									"value": "true",
+									"type": "text",
+									"description": "Boolean"
+								},
+								{
+									"key": "elevator",
+									"value": "true",
+									"type": "text",
+									"description": "Boolean"
+								},
+								{
+									"key": "construction_year",
+									"value": "2018",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "availability_date",
+									"value": "2024-12-01",
+									"type": "text",
+									"description": "Format: YYYY-MM-DD",
+									"disabled": true
+								},
+								{
+									"key": "featured",
+									"value": "false",
+									"type": "text",
+									"description": "Boolean",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "available",
+									"type": "text",
+									"description": "Options: available, sold, rented, pending"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": [],
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/properties",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties"
+							]
+						},
+						"description": "Créer une nouvelle propriété (Agent/Admin uniquement)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Property",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Appartement moderne avec vue sur la Tour Eiffel - MISE À JOUR",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "475000",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Description mise à jour avec plus de détails sur ce magnifique appartement parisien",
+									"type": "text"
+								},
+								{
+									"key": "status",
+									"value": "pending",
+									"type": "text",
+									"description": "Options: available, sold, rented, pending"
+								},
+								{
+									"key": "featured",
+									"value": "true",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/properties/{{property_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"{{property_id}}"
+							]
+						},
+						"description": "Mettre à jour une propriété (Agent/Admin uniquement)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Property",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/properties/{{property_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"properties",
+								"{{property_id}}"
+							]
+						},
+						"description": "Supprimer une propriété (Agent/Admin uniquement)"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de gestion des propriétés"
+		},
+		{
+			"name": "Inquiries",
+			"item": [
+				{
+					"name": "Create Inquiry",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.id) {",
+									"        pm.collectionVariables.set('inquiry_id', response.data.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": \"{{user_id}}\",\n    \"property_id\": \"{{property_id}}\",\n    \"inquiry_type\": \"visit_request\",\n    \"message\": \"Bonjour, je suis très intéressé par cette propriété. Serait-il possible d'organiser une visite cette semaine ?\",\n    \"preferred_date\": \"2024-12-15\",\n    \"preferred_time\": \"14:00\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/inquiries",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inquiries"
+							]
+						},
+						"description": "Créer une nouvelle demande de renseignements. inquiry_type: visit_request, info_request, offer"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Inquiries (Agent/Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/inquiries",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inquiries"
+							]
+						},
+						"description": "Récupérer toutes les demandes (Agent/Admin uniquement)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Inquiry by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/inquiries/{{inquiry_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inquiries",
+								"{{inquiry_id}}"
+							]
+						},
+						"description": "Récupérer une demande par son ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Inquiries by User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/inquiries/user/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inquiries",
+								"user",
+								"{{user_id}}"
+							]
+						},
+						"description": "Récupérer les demandes d'un utilisateur spécifique"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Inquiries by Property",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/inquiries/property/{{property_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inquiries",
+								"property",
+								"{{property_id}}"
+							]
+						},
+						"description": "Récupérer toutes les demandes pour une propriété"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Inquiry",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"confirmed\",\n    \"agent_response\": \"Bonjour, merci pour votre intérêt. Je confirme la visite pour le 15/12 à 14h. À bientôt !\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/inquiries/{{inquiry_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inquiries",
+								"{{inquiry_id}}"
+							]
+						},
+						"description": "Mettre à jour une demande (Agent/Admin uniquement). status: pending, confirmed, completed, cancelled"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Inquiry",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/inquiries/{{inquiry_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"inquiries",
+								"{{inquiry_id}}"
+							]
+						},
+						"description": "Supprimer une demande (Agent/Admin uniquement)"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de gestion des demandes de renseignements"
+		}
+	]
+}
